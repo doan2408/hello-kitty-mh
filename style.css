@@ -3026,7 +3026,8 @@ body.theater-active .music-widget-container {
 
 body.theater-active .music-widget {
     width: 100%;
-    height: 100%;
+    min-height: 100%;
+    height: auto;
     max-height: none;
     border: none;
     box-shadow: none;
@@ -3034,7 +3035,7 @@ body.theater-active .music-widget {
     background: transparent;
     display: grid;
     grid-template-columns: 2.2fr 1fr;
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto auto auto minmax(260px, auto);
     gap: 20px 24px;
     overflow-y: visible;
 }
@@ -3408,6 +3409,7 @@ body.theater-active .theater-comments {
     margin-top: 15px;
     border-top: 2px dashed var(--primary-pink);
     padding-top: 20px;
+    min-height: 260px;
 }
 
 .comments-header {
@@ -3757,74 +3759,464 @@ body.dark-theme .theater-sidebar {
 /* ==========================================
    THEATER MODE RESPONSIVE OVERRIDES
    ========================================== */
+
+/* --- Tablet: 1024px --- */
 @media (max-width: 1024px) {
     body.theater-active .music-widget {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto auto auto;
-        overflow-y: auto;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 16px 18px;
     }
-    
-    body.theater-active #theater-header {
-        grid-column: 1;
-        grid-row: 1;
-    }
-    
-    body.theater-active #video-view {
-        grid-column: 1;
-        grid-row: 2;
-    }
-    
-    body.theater-active .theater-details {
-        grid-column: 1;
-        grid-row: 3;
-    }
-    
-    body.theater-active .theater-sidebar {
-        grid-column: 1;
-        grid-row: 4;
-        max-height: 400px;
-        margin-top: 10px;
-    }
-    
-    body.theater-active .theater-comments {
-        grid-column: 1;
-        grid-row: 5;
-        margin-top: 20px;
-        padding-top: 20px;
-    }
-    
+
     .theater-search-box {
-        width: 50%;
+        width: 46%;
     }
 }
 
-@media (max-width: 600px) {
-    .theater-search-box {
-        display: none; /* Hide search bar in header on ultra small screens to prevent overlap */
-    }
-    
+/* --- Tablet portrait / large phone: 768px --- */
+@media (max-width: 768px) {
     body.theater-active .music-widget-container {
         top: 0; left: 0; right: 0; bottom: 0;
         width: 100vw; height: 100vh;
+        max-width: 100vw; max-height: 100vh;
         border-radius: 0; border: none;
+        padding: 12px 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    body.theater-active .music-widget {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        height: auto;
+        overflow-y: visible;
+    }
+
+    /* Header: keep search available on mobile without crowding logo/close */
+    body.theater-active #theater-header {
+        flex-wrap: wrap;
+        padding-bottom: 10px;
+        gap: 8px;
+    }
+
+    .theater-search-box {
+        display: flex;
+        order: 3;
+        width: 100%;
+        max-width: none;
+        flex-basis: 100%;
+    }
+
+    .theater-search-box input {
+        padding: 9px 13px;
+        font-size: 0.82rem;
+    }
+
+    .theater-search-box button {
+        padding: 0 16px;
+    }
+
+    /* Video: full width */
+    body.theater-active #video-view {
+        width: 100%;
+    }
+
+    body.theater-active .video-iframe-container {
+        border-radius: 14px;
+        border-width: 3px;
+    }
+
+    /* Details */
+    body.theater-active .theater-details {
+        padding: 0;
+    }
+
+    .video-title {
+        font-size: 1rem;
+        line-height: 1.35;
+    }
+
+    .video-action-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .video-channel-row {
+        gap: 8px;
+    }
+
+    .video-channel-info {
+        gap: 8px;
+    }
+
+    /* Action buttons: shrink on mobile */
+    .video-actions {
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .video-actions .btn {
+        padding: 6px 10px;
+        font-size: 0.72rem;
+    }
+
+    .video-views-row {
+        font-size: 0.8rem;
+    }
+
+    /* Sidebar: becomes a horizontal scrollable row on mobile */
+    body.theater-active .theater-sidebar {
+        grid-column: unset;
+        grid-row: unset;
+        max-height: none;
+        height: auto;
+        overflow-y: visible;
+        border-radius: 16px;
         padding: 12px;
     }
-    
-    .video-title {
-        font-size: 1.1rem;
+
+    .sidebar-tabs {
+        gap: 6px;
     }
-    
-    .video-action-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .video-actions {
-        width: 100%;
-        justify-content: flex-start;
+
+    /* Sidebar list becomes horizontal scroller */
+    .sidebar-list {
+        flex-direction: row;
         overflow-x: auto;
-        padding-bottom: 4px;
+        gap: 10px;
+        padding-bottom: 6px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .sidebar-list::-webkit-scrollbar { height: 4px; }
+    .sidebar-list::-webkit-scrollbar-thumb {
+        background: var(--primary-pink);
+        border-radius: 4px;
+    }
+
+    /* Each sidebar card: fixed width so they scroll nicely */
+    .sidebar-card {
+        flex-direction: column;
+        min-width: 140px;
+        max-width: 140px;
+        scroll-snap-align: start;
+        gap: 8px;
+    }
+
+    .sidebar-thumb-wrapper {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+    }
+
+    .sidebar-card-info {
+        padding: 0 2px;
+    }
+
+    .sidebar-card-title {
+        font-size: 0.72rem;
+        -webkit-line-clamp: 2;
+    }
+
+    /* Sentinel and loading for horizontal scroll */
+    .sidebar-load-sentinel,
+    .sidebar-loading-indicator,
+    .sidebar-end-marker {
+        min-width: 80px;
+        flex-shrink: 0;
+        writing-mode: horizontal-tb;
+    }
+
+    /* Comments: lighter */
+    body.theater-active .theater-comments {
+        padding-top: 14px;
+        margin-top: 0;
+    }
+
+    .theater-comments {
+        max-height: none;
+        overflow-y: visible;
     }
 }
 
+/* --- Small phones: 480px --- */
+@media (max-width: 480px) {
+    body.theater-active .music-widget-container {
+        padding: 8px 8px;
+    }
 
+    body.theater-active #theater-header {
+        gap: 6px;
+        font-size: 0.8rem;
+    }
+
+    .theater-search-box input {
+        padding: 8px 12px;
+        font-size: 0.78rem;
+    }
+
+    .theater-search-box button {
+        padding: 0 13px;
+    }
+
+    .theater-close-btn {
+        font-size: 1rem;
+        padding: 6px 10px;
+    }
+
+    .video-title {
+        font-size: 0.92rem;
+    }
+
+    /* Subscribe btn */
+    #theater-subscribe-btn {
+        padding: 5px 10px;
+        font-size: 0.7rem;
+    }
+
+    /* Action buttons: 2-row grid */
+    .video-actions {
+        display: grid;
+        grid-template-columns: repeat(3, auto);
+        gap: 6px;
+    }
+
+    .video-actions .btn {
+        padding: 5px 8px;
+        font-size: 0.68rem;
+    }
+
+    /* Sidebar cards even smaller */
+    .sidebar-card {
+        min-width: 120px;
+        max-width: 120px;
+    }
+
+    /* Comments input */
+    .comment-input-row {
+        gap: 8px;
+    }
+
+    .comment-text {
+        font-size: 0.84rem;
+        padding: 8px 10px;
+    }
+
+    .comment-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+}
+
+/* ============================================================
+   SEARCH SUGGESTIONS AUTOCOMPLETE DROPDOWN
+   ============================================================ */
+.theater-search-box,
+.playlist-search-box {
+    position: relative;
+}
+
+.search-suggestions-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border: 2px solid var(--primary-pink);
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(255, 133, 162, 0.25);
+    z-index: 100000;
+    list-style: none;
+    padding: 6px 0;
+    display: none;
+    max-height: 250px;
+    overflow-y: auto;
+    animation: fadeInUp 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    isolation: isolate;
+}
+
+body.dark-theme .search-suggestions-dropdown {
+    background: #20243a;
+    border-color: var(--accent-red);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.search-suggestions-dropdown::-webkit-scrollbar { width: 5px; }
+.search-suggestions-dropdown::-webkit-scrollbar-thumb {
+    background: var(--primary-pink);
+    border-radius: 4px;
+}
+
+.suggestion-item {
+    padding: 9px 16px;
+    font-size: 0.82rem;
+    font-family: var(--font-body);
+    color: var(--text-dark);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background-color 0.13s ease, color 0.13s ease;
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: var(--white);
+}
+
+.suggestion-item i {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    flex-shrink: 0;
+    width: 14px;
+}
+
+body.dark-theme .suggestion-item {
+    background: #20243a;
+    color: #f6edf2;
+}
+
+body.dark-theme .suggestion-item i {
+    color: #c9bdc7;
+}
+
+.suggestion-item:hover,
+.suggestion-item.kbd-active {
+    background-color: var(--light-pink);
+    color: var(--accent-red);
+}
+
+.suggestion-item:hover i,
+.suggestion-item.kbd-active i {
+    color: var(--accent-red);
+}
+
+body.dark-theme .suggestion-item:hover,
+body.dark-theme .suggestion-item.kbd-active {
+    background-color: rgba(255, 75, 114, 0.22);
+    color: #ffffff;
+}
+
+body.theater-active .theater-search-box {
+    z-index: 100001;
+}
+
+body.theater-active .theater-search-box .search-suggestions-dropdown {
+    z-index: 100002;
+}
+
+@media (max-width: 768px) {
+    body.theater-active .theater-search-box {
+        position: relative;
+        margin-bottom: 4px;
+        flex-wrap: wrap;
+    }
+
+    body.theater-active .theater-search-box .search-suggestions-dropdown {
+        position: static;
+        flex-basis: 100%;
+        margin-top: 6px;
+        max-height: 180px;
+        width: 100%;
+    }
+}
+
+/* ============================================================
+   SIDEBAR INFINITE SCROLL LOADING
+   ============================================================ */
+.sidebar-pane {
+    overflow-y: visible; /* scroll handled by parent .theater-sidebar */
+}
+
+.sidebar-loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 0 10px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: var(--font-heading);
+}
+
+.sidebar-loading-indicator .load-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.sidebar-loading-indicator .load-dots span {
+    width: 6px;
+    height: 6px;
+    background: var(--primary-pink);
+    border-radius: 50%;
+    display: inline-block;
+    animation: dotBounce 1.1s ease-in-out infinite;
+}
+
+.sidebar-loading-indicator .load-dots span:nth-child(2) { animation-delay: 0.18s; }
+.sidebar-loading-indicator .load-dots span:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes dotBounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+    40%            { transform: scale(1);   opacity: 1; }
+}
+
+.sidebar-load-sentinel {
+    height: 4px;
+    width: 100%;
+}
+
+/* Fix sidebar end marker - subtle, not red border box */
+.sidebar-end-marker {
+    text-align: center;
+    padding: 12px 0 6px;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-style: italic;
+    opacity: 0.6;
+    border: none;
+    background: none;
+}
+
+/* ============================================================
+   COMMENTS INFINITE SCROLL
+   ============================================================ */
+.comments-load-sentinel {
+    height: 4px;
+    width: 100%;
+}
+
+.comments-end-marker {
+    text-align: center;
+    padding: 14px 0 8px;
+    color: var(--text-muted);
+    font-size: 0.74rem;
+    font-style: italic;
+    opacity: 0.65;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.comments-end-marker i {
+    color: var(--primary-pink);
+    font-size: 0.8rem;
+}
+
+/* Comments area needs scroll for IntersectionObserver to work */
+.theater-comments {
+    overflow-y: auto;
+    max-height: 70vh;
+    scroll-behavior: smooth;
+}
+
+.theater-comments::-webkit-scrollbar { width: 5px; }
+.theater-comments::-webkit-scrollbar-track { background: transparent; }
+.theater-comments::-webkit-scrollbar-thumb {
+    background: var(--primary-pink);
+    border-radius: 4px;
+    opacity: 0.6;
+}

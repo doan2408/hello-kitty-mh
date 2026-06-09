@@ -60,14 +60,20 @@ const MOCK_COMMENTS_SEED = [
     { author: "My Melody 🌸", avatar: "🌸", text: "Không gian màu hồng này kết hợp với giai điệu lofi này thật hoàn hảo đó nha! 🌸🎀", time: "2 ngày trước" }
 ];
 
-// Recommended Seeds for Sidebar (real YouTube video IDs — thumbnails will always load)
+// Recommended Seeds for Sidebar (real YouTube video IDs — 12 items so pagination always works)
 const RECOMMENDED_SEEDS = [
-    { title: "Hello Kitty's Dreamy Afternoon 🌸", artist: "Lofi Lulupop", youtubeId: "BzEHa_tQ2DI", duration: 3600 },
-    { title: "Sweet Dream Lofi Beats 🌙", artist: "Lofi Girl", youtubeId: "5qap5aO4i9A", duration: 3600 },
-    { title: "Cinnamoroll's Beachside Tea ☁️", artist: "Lofi Lulupop", youtubeId: "N4tLwN5yO5k", duration: 3600 },
-    { title: "Hello Kitty Lofi Chill Loop 🎀", artist: "Sweet Lofi Beats", youtubeId: "jfKfPfyJRdk", duration: 300 },
-    { title: "Lời Nói Dối Chân Thật (Piano) 🎹", artist: "An Coong Piano Cover", youtubeId: "-9rqKAKIE4M", duration: 259 },
-    { title: "Lời Nói Dối Chân Thật (Acoustic) 🎵", artist: "Hoàng Dũng x Lâm Bảo Ngọc", youtubeId: "cTYrJKRhjgg", duration: 288 }
+    { title: "Hello Kitty's Dreamy Afternoon 🌸",         artist: "Lofi Lulupop",                 youtubeId: "BzEHa_tQ2DI",  duration: 3600 },
+    { title: "Sweet Dream Lofi Beats 🌙",               artist: "Lofi Girl",                    youtubeId: "5qap5aO4i9A",  duration: 3600 },
+    { title: "Cinnamoroll's Beachside Tea ☁️",           artist: "Lofi Lulupop",                 youtubeId: "N4tLwN5yO5k",  duration: 3600 },
+    { title: "Hello Kitty Lofi Chill Loop 🎀",          artist: "Sweet Lofi Beats",              youtubeId: "jfKfPfyJRdk",  duration: 300  },
+    { title: "Lời Nói Dối Chân Thật (Piano) 🎹",      artist: "An Coong Piano Cover",          youtubeId: "-9rqKAKIE4M", duration: 259  },
+    { title: "Lời Nói Dối Chân Thật (Acoustic) 🎵",  artist: "Hoàng Dũng x Lâm Bảo Ngọc",      youtubeId: "cTYrJKRhjgg",  duration: 288  },
+    { title: "Chillhop Essentials ☀️",                  artist: "Chillhop Music",                youtubeId: "7NOSDKb0HlU",  duration: 3600 },
+    { title: "Lofi Hip Hop Radio 📚",                   artist: "Lofi Girl",                    youtubeId: "jfKfPfyJRdk",  duration: 3600 },
+    { title: "Chân Thật (Official MV) 💔",            artist: "JustaTee x Kimmese",            youtubeId: "wkJ2HQQB2-0", duration: 288  },
+    { title: "Cả Nhà Thương Nhau (Piano) 🎹",       artist: "An Coong Piano",                youtubeId: "3cSBxeDzYvo",  duration: 215  },
+    { title: "Người Hãy Quên Em 🌸",               artist: "Miu Lê",                        youtubeId: "9iFmkO4MNRA",  duration: 244  },
+    { title: "Cute Cafe Lofi Mix ☕",                  artist: "Dreamy",                       youtubeId: "lP9kYzVkJkY",  duration: 3600 }
 ];
 
 // Helper to generate consistent seeded pseudo-random values based on ID
@@ -84,115 +90,218 @@ function getSeededValue(str, min, max) {
 function updateTheaterDetails(track) {
     if (!track) return;
     
-    // 1. Title and Channel Name
-    const titleEl = document.getElementById('theater-video-title');
-    const channelEl = document.getElementById('theater-channel-name');
-    if (titleEl) titleEl.textContent = track.title;
-    if (channelEl) channelEl.textContent = track.artist;
-    
-    // 2. Generate and format consistent seeded values
-    const viewsCount = getSeededValue(track.youtubeId || track.youtubeId, 100000, 5000000);
-    const likesCount = getSeededValue(track.youtubeId || track.youtubeId, 5000, 150000);
-    const subsCount = getSeededValue(track.artist, 10000, 2500000);
-    const dateCount = getSeededValue(track.youtubeId || track.youtubeId, 1, 10);
-    
     const formatNumberVN = (num) => {
-        if (num >= 1000000) {
-            return (num / 1000000).toFixed(2).replace('.', ',') + " Tr";
-        }
-        if (num >= 1000) {
-            return (num / 1000).toFixed(1).replace('.', ',') + " N";
-        }
+        if (num >= 1000000) return (num / 1000000).toFixed(2).replace('.', ',') + " Tr";
+        if (num >= 1000)    return (num / 1000).toFixed(1).replace('.', ',') + " N";
+        return num.toString();
+    };
+    const formatShortNumber = (num) => {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+        if (num >= 1000)    return (num / 1000).toFixed(1) + "K";
         return num.toString();
     };
 
-    const formatShortNumber = (num) => {
-        if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
-        if (num >= 1000) return (num / 1000).toFixed(1) + "K";
-        return num.toString();
-    };
-    
-    const viewsEl = document.getElementById('theater-views');
-    const subCountEl = document.getElementById('theater-sub-count');
-    const likeCountEl = document.getElementById('like-count');
-    const dateEl = document.getElementById('theater-date');
-    
-    if (viewsEl) viewsEl.textContent = viewsCount.toLocaleString('vi-VN') + " lượt xem";
-    if (subCountEl) subCountEl.textContent = formatNumberVN(subsCount) + " người đăng ký";
-    if (likeCountEl) likeCountEl.textContent = formatShortNumber(likesCount);
-    if (dateEl) dateEl.textContent = dateCount + " năm trước";
-    
-    // Description text
+    // 1. Title and Channel Name (immediate)
+    const titleEl      = document.getElementById('theater-video-title');
+    const channelEl    = document.getElementById('theater-channel-name');
+    const viewsEl      = document.getElementById('theater-views');
+    const subCountEl   = document.getElementById('theater-sub-count');
+    const likeCountEl  = document.getElementById('like-count');
+    const dateEl       = document.getElementById('theater-date');
     const descContentEl = document.getElementById('theater-desc-content');
-    if (descContentEl) {
-        descContentEl.textContent = `Chào mừng bạn đến với giai điệu "${track.title}" của nghệ sĩ ${track.artist}.\n\nĐây là một bài nhạc nằm trong danh sách các giai điệu Hello Kitty dễ thương, mang lại cho bạn những giây phút thư giãn ngọt ngào nhất. Hãy tận hưởng không gian hồng lãng mạn cùng chúng mình nhé! 🌸🎀🍭`;
-    }
-    
-    // Description collapse reset
-    const descContent = document.getElementById('theater-desc-content');
-    const descToggle = document.getElementById('theater-desc-toggle');
-    if (descContent && descToggle) {
-        descContent.classList.add('collapsed');
-        descToggle.textContent = 'Thêm';
-    }
-    
-    // 3. Subscribed state
+
+    if (titleEl)   titleEl.textContent = track.title;
+    if (channelEl) channelEl.textContent = track.artist;
+
+    // Show placeholder while loading real stats
+    if (viewsEl)    viewsEl.textContent   = '...';
+    if (subCountEl) subCountEl.textContent = '...';
+    if (dateEl)     dateEl.textContent     = '...';
+    if (descContentEl) descContentEl.textContent = 'Đang tải thông tin...';
+
+    // Seeded fallback values (used until real data arrives)
+    const fallbackViews = getSeededValue(track.youtubeId, 100000, 5000000);
+    const fallbackLikes = getSeededValue(track.youtubeId, 5000, 150000);
+    const fallbackSubs  = getSeededValue(track.artist, 10000, 2500000);
+
+    // Apply liked state with fallback likes
+    const applyLikedState = (realLikes) => {
+        const count = realLikes !== null ? realLikes : fallbackLikes;
+        if (likeCountEl) likeCountEl.textContent = formatShortNumber(count);
+        const likeBtn  = document.getElementById('theater-like-btn');
+        if (likeBtn) {
+            const isLiked   = localStorage.getItem('kitty_liked_' + track.youtubeId) === 'true';
+            const heartIcon = likeBtn.querySelector('i');
+            if (isLiked) {
+                likeBtn.classList.add('liked');
+                if (heartIcon) heartIcon.className = 'fa-solid fa-thumbs-up';
+                if (likeCountEl) likeCountEl.textContent = formatShortNumber(count + 1);
+            } else {
+                likeBtn.classList.remove('liked');
+                if (heartIcon) heartIcon.className = 'fa-regular fa-thumbs-up';
+            }
+        }
+    };
+    applyLikedState(null); // show fallback immediately
+
+    // 2. Subscribe state (immediate from localStorage)
     const subBtn = document.getElementById('theater-subscribe-btn');
     if (subBtn) {
         const isSubbed = localStorage.getItem('kitty_subbed_' + encodeURIComponent(track.artist)) === 'true';
-        if (isSubbed) {
-            subBtn.textContent = 'Đã đăng ký';
-            subBtn.classList.add('subscribed');
-        } else {
-            subBtn.textContent = 'Đăng ký';
-            subBtn.classList.remove('subscribed');
-        }
+        subBtn.textContent = isSubbed ? 'Đã đăng ký' : 'Đăng ký';
+        isSubbed ? subBtn.classList.add('subscribed') : subBtn.classList.remove('subscribed');
     }
-    
-    // 4. Liked state
-    const likeBtn = document.getElementById('theater-like-btn');
-    if (likeBtn) {
-        const isLiked = localStorage.getItem('kitty_liked_' + (track.youtubeId || track.youtubeId)) === 'true';
-        const heartIcon = likeBtn.querySelector('i');
-        if (isLiked) {
-            likeBtn.classList.add('liked');
-            if (heartIcon) heartIcon.className = 'fa-solid fa-thumbs-up';
-            if (likeCountEl) likeCountEl.textContent = formatShortNumber(likesCount + 1);
-        } else {
-            likeBtn.classList.remove('liked');
-            if (heartIcon) heartIcon.className = 'fa-regular fa-thumbs-up';
-        }
+
+    // Description collapse reset
+    const descToggle = document.getElementById('theater-desc-toggle');
+    if (descContentEl && descToggle) {
+        descContentEl.classList.add('collapsed');
+        descToggle.textContent = 'Thêm';
     }
-    
-    // 5. Render comments and sidebar
+
+    // 3. Fetch REAL stats from Invidious API
+    fetchInvidiousVideoMeta(track.youtubeId)
+        .then(meta => {
+            // Real view count
+            if (viewsEl && meta.viewCount !== undefined) {
+                viewsEl.textContent = Number(meta.viewCount).toLocaleString('vi-VN') + ' lượt xem';
+            } else if (viewsEl) {
+                viewsEl.textContent = fallbackViews.toLocaleString('vi-VN') + ' lượt xem';
+            }
+
+            // Real subscriber count
+            if (subCountEl) {
+                const subs = meta.subCountText || (meta.authorStats && meta.authorStats.subscriberCountText);
+                if (subs) {
+                    subCountEl.textContent = subs + ' người đăng ký';
+                } else if (meta.subCount !== undefined && meta.subCount !== null) {
+                    subCountEl.textContent = formatNumberVN(meta.subCount) + ' người đăng ký';
+                } else {
+                    subCountEl.textContent = formatNumberVN(fallbackSubs) + ' người đăng ký';
+                }
+            }
+
+            // Real like count
+            if (meta.likeCount !== undefined && meta.likeCount !== null) {
+                applyLikedState(meta.likeCount);
+            }
+
+            // Real upload date
+            if (dateEl) {
+                if (meta.publishedText) {
+                    // Translate common English time strings to Vietnamese
+                    const translated = meta.publishedText
+                        .replace(/(\d+) years? ago/,     '$1 năm trước')
+                        .replace(/(\d+) months? ago/,    '$1 tháng trước')
+                        .replace(/(\d+) weeks? ago/,     '$1 tuần trước')
+                        .replace(/(\d+) days? ago/,      '$1 ngày trước')
+                        .replace(/(\d+) hours? ago/,     '$1 giờ trước')
+                        .replace(/(\d+) minutes? ago/,   '$1 phút trước')
+                        .replace('Streamed',              'Đã phát trực tiếp')
+                        .replace('Premiered',             'Ra mắt');
+                    dateEl.textContent = translated;
+                } else if (meta.published) {
+                    const d = new Date(meta.published * 1000);
+                    dateEl.textContent = d.toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' });
+                } else {
+                    dateEl.textContent = getSeededValue(track.youtubeId, 1, 8) + ' năm trước';
+                }
+            }
+
+            // Real description
+            if (descContentEl && meta.description) {
+                descContentEl.textContent = meta.description.slice(0, 800) + (meta.description.length > 800 ? '...' : '');
+            } else if (descContentEl) {
+                descContentEl.textContent = `Chào mừng bạn đến với giai điệu "${track.title}" của nghệ sĩ ${track.artist}.\n\nHãy tận hưởng khoảng thời gian thư giãn cùng chúng mình nhé! 🌸🎀🍭`;
+            }
+
+            // Update channel avatar if available
+            const avatarImg = document.getElementById('theater-channel-avatar');
+            if (avatarImg && meta.authorThumbnails && meta.authorThumbnails.length > 0) {
+                const best = meta.authorThumbnails.find(t => t.width >= 48) || meta.authorThumbnails[0];
+                if (best && best.url) avatarImg.src = best.url;
+            }
+        })
+        .catch(() => {
+            // Fallback to seeded values
+            if (viewsEl)    viewsEl.textContent    = fallbackViews.toLocaleString('vi-VN') + ' lượt xem';
+            if (subCountEl) subCountEl.textContent  = formatNumberVN(fallbackSubs) + ' người đăng ký';
+            if (dateEl)     dateEl.textContent      = getSeededValue(track.youtubeId, 1, 8) + ' năm trước';
+            if (descContentEl) descContentEl.textContent = `Chào mừng bạn đến với giai điệu "${track.title}" của nghệ sĩ ${track.artist}.\n\nHãy tận hưởng khoảng thời gian thư giãn cùng chúng mình nhé! 🌸🎀🍭`;
+        });
+
+    // 4. Render comments and sidebar (parallel with API fetch)
     renderComments(track.youtubeId);
     renderTheaterSidebar(track.youtubeId);
 }
 
+function buildInvidiousApiUrl(instanceUrl, path, params = {}) {
+    const url = new URL(path, instanceUrl);
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+            url.searchParams.set(key, value);
+        }
+    });
+    return url.toString();
+}
+
+function getCommentsScrollRoot() {
+    const commentsEl = document.querySelector('.theater-comments');
+    if (commentsEl) {
+        const style = window.getComputedStyle(commentsEl);
+        const canScroll = /(auto|scroll)/.test(style.overflowY) && commentsEl.scrollHeight > commentsEl.clientHeight;
+        if (canScroll) return commentsEl;
+    }
+
+    const modalEl = document.getElementById('music-widget-container');
+    if (modalEl) {
+        const style = window.getComputedStyle(modalEl);
+        const canScroll = /(auto|scroll)/.test(style.overflowY) && modalEl.scrollHeight > modalEl.clientHeight;
+        if (canScroll) return modalEl;
+    }
+
+    return null;
+}
+
+function escapeHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Fetch comments from YouTube via Invidious API with sequential fallback retry loop
-async function fetchInvidiousComments(videoId) {
+async function fetchInvidiousComments(videoId, continuation) {
     let instances = [...INVIDIOUS_FALLBACK_INSTANCES];
     
-    // Try to fetch registry first
-    try {
-        const response = await fetch('https://api.invidious.io/instances.json?sort_by=type,health');
-        if (response.ok) {
-            const data = await response.json();
-            const healthyList = data
-                .filter(inst => inst[1].cors === true && inst[1].api !== false && inst[1].type === 'https' && (!inst[1].monitor || inst[1].monitor.down === false))
-                .map(inst => inst[1].uri);
-            if (healthyList.length > 0) {
-                instances = [...new Set([...healthyList, ...INVIDIOUS_FALLBACK_INSTANCES])];
+    // Try to fetch registry first (skip on continuation requests to save time)
+    if (!continuation) {
+        try {
+            const response = await fetch('https://api.invidious.io/instances.json?sort_by=type,health');
+            if (response.ok) {
+                const data = await response.json();
+                const healthyList = data
+                    .filter(inst => inst[1].cors === true && inst[1].api !== false && inst[1].type === 'https' && (!inst[1].monitor || inst[1].monitor.down === false))
+                    .map(inst => inst[1].uri);
+                if (healthyList.length > 0) {
+                    instances = [...new Set([...healthyList, ...INVIDIOUS_FALLBACK_INSTANCES])];
+                }
             }
+        } catch (e) {
+            console.warn("Could not fetch Invidious registry for comments, using fallback list:", e);
         }
-    } catch (e) {
-        console.warn("Could not fetch Invidious registry for comments, using fallback list:", e);
     }
     
     for (const uri of instances) {
         try {
-            console.log(`Fetching comments via: ${uri}`);
-            const url = `${uri}/api/v1/comments/${videoId}`;
+            const url = buildInvidiousApiUrl(uri, `/api/v1/comments/${videoId}`, {
+                source: 'youtube',
+                sort_by: 'top',
+                hl: 'vi',
+                continuation
+            });
             
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 6000);
@@ -203,7 +312,7 @@ async function fetchInvidiousComments(videoId) {
             if (res.ok) {
                 const data = await res.json();
                 if (data && Array.isArray(data.comments)) {
-                    return data;
+                    return data; // { comments: [], commentCount, continuation }
                 }
             }
         } catch (err) {
@@ -211,6 +320,59 @@ async function fetchInvidiousComments(videoId) {
         }
     }
     throw new Error("Không thể tải bình luận từ YouTube. Sử dụng bình luận giả lập! 🌸");
+}
+
+// Fetch real video metadata (views, likes, subs, date, description) from Invidious
+async function fetchInvidiousVideoMeta(videoId) {
+    let instances = [...INVIDIOUS_FALLBACK_INSTANCES];
+
+    try {
+        const response = await fetch('https://api.invidious.io/instances.json?sort_by=type,health');
+        if (response.ok) {
+            const data = await response.json();
+            const healthyList = data
+                .filter(inst => inst[1].cors === true && inst[1].api !== false && inst[1].type === 'https' && (!inst[1].monitor || inst[1].monitor.down === false))
+                .map(inst => inst[1].uri);
+            if (healthyList.length > 0) instances = [...new Set([...healthyList, ...INVIDIOUS_FALLBACK_INSTANCES])];
+        }
+    } catch (e) {}
+
+    for (const uri of instances) {
+        try {
+            const controller = new AbortController();
+            const tid = setTimeout(() => controller.abort(), 6000);
+            const res = await fetch(`${uri}/api/v1/videos/${videoId}`, { signal: controller.signal });
+            clearTimeout(tid);
+            if (!res.ok) continue;
+            const data = await res.json();
+            if (!data || !data.videoId) continue;
+
+            // Extract subCount from channel info if available
+            let subCount = null;
+            let subCountText = null;
+            if (data.authorStats) {
+                subCount = data.authorStats.subscriberCount;
+                subCountText = data.authorStats.subscriberCountText;
+            }
+            // Some instances embed it directly
+            if (!subCount && data.subCountText) subCountText = data.subCountText;
+
+            return {
+                viewCount:        data.viewCount,
+                likeCount:        data.likeCount || null,
+                published:        data.published,
+                publishedText:    data.publishedText,
+                description:      data.description || '',
+                author:           data.author,
+                authorThumbnails: data.authorThumbnails || [],
+                subCount,
+                subCountText,
+            };
+        } catch (err) {
+            console.warn(`fetchInvidiousVideoMeta failed for ${uri}:`, err.message);
+        }
+    }
+    throw new Error('Could not fetch video metadata from any Invidious instance');
 }
 
 // Fetch related/recommended videos from YouTube via Invidious API
@@ -256,85 +418,211 @@ async function fetchInvidiousRelatedVideos(videoId) {
 }
 
 // Render Comment Section (Combines user comments with real YouTube comments or mock comments)
+// ============================================================
+// COMMENT RENDERING – WITH INFINITE SCROLL
+// ============================================================
+
+// Build a single comment DOM element
+function buildCommentEl(comment) {
+    const item = document.createElement('div');
+    item.className = 'comment-item';
+
+    const isPinnedHtml = comment.isPinned
+        ? `<span style="color:var(--accent-red);font-size:0.72rem;font-weight:bold;margin-bottom:4px;display:block;"><i class="fa-solid fa-thumbtack"></i> Được ghim</span>`
+        : '';
+
+    const likesHtml = comment.likeCount !== undefined && comment.likeCount > 0
+        ? `<span style="font-size:0.75rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;margin-top:6px;"><i class="fa-regular fa-thumbs-up"></i> ${Number(comment.likeCount).toLocaleString('vi-VN')}</span>`
+        : '';
+
+    let avatarHtml = '🌸';
+    if (comment.avatar) {
+        avatarHtml = escapeHtml(comment.avatar);
+    } else if (comment.authorThumbnails && comment.authorThumbnails.length > 0) {
+        avatarHtml = `<img src="${escapeHtml(comment.authorThumbnails[0].url)}" alt="${escapeHtml(comment.author || '')}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    }
+
+    item.innerHTML = `
+        <div class="comment-avatar">${avatarHtml}</div>
+        <div class="comment-details">
+            <div class="comment-author-row">
+                <span class="comment-author">${escapeHtml(comment.author || 'Người dùng')}</span>
+                <span class="comment-time">${escapeHtml(comment.time || comment.publishedText || 'Vừa xong')}</span>
+            </div>
+            ${isPinnedHtml}
+            <div class="comment-text">${escapeHtml(comment.content || comment.text || '')}</div>
+            ${likesHtml}
+        </div>
+    `;
+    return item;
+}
+
+// Attach IntersectionObserver sentinel to the bottom of comments list
+function attachCommentsSentinel(listEl) {
+    if (commentsObserver) { commentsObserver.disconnect(); commentsObserver = null; }
+    if (commentsContainer && commentsContainer._commentsScrollHandler) {
+        commentsContainer.removeEventListener('scroll', commentsContainer._commentsScrollHandler);
+        commentsContainer._commentsScrollHandler = null;
+    }
+    listEl.querySelector('.comments-load-sentinel')?.remove();
+    listEl.querySelector('.comments-loading-indicator')?.remove();
+    listEl.querySelector('.comments-end-marker')?.remove();
+
+    // Check if we still have items to show OR can fetch more
+    const hasMore = commentsShownCount < allCommentsPool.length || commentsContinuation;
+    if (!hasMore) {
+        const end = document.createElement('div');
+        end.className = 'comments-end-marker';
+        end.innerHTML = `<i class="fa-solid fa-circle-check"></i> Đã hiển thị tất cả bình luận`;
+        listEl.appendChild(end);
+        return;
+    }
+
+    const sentinel = document.createElement('div');
+    sentinel.className = 'comments-load-sentinel';
+    listEl.appendChild(sentinel);
+
+    const root = getCommentsScrollRoot();
+    commentsContainer = root;
+
+    commentsObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !commentsLoadingMore) {
+            loadMoreComments(listEl);
+        }
+    }, { root, rootMargin: '0px 0px 300px 0px', threshold: 0 });
+
+    commentsObserver.observe(sentinel);
+
+    if (root) {
+        const handler = () => {
+            const nearBottom = root.scrollTop + root.clientHeight >= root.scrollHeight - 240;
+            if (nearBottom && !commentsLoadingMore) {
+                loadMoreComments(listEl);
+            }
+        };
+        root._commentsScrollHandler = handler;
+        root.addEventListener('scroll', handler, { passive: true });
+    }
+}
+
+// Render next batch of comments from allCommentsPool (and fetch next API page if needed)
+function loadMoreComments(listEl) {
+    if (commentsLoadingMore) return;
+    commentsLoadingMore = true;
+
+    // Remove old sentinel
+    listEl.querySelector('.comments-load-sentinel')?.remove();
+
+    // If we have queued comments, show them immediately
+    if (commentsShownCount < allCommentsPool.length) {
+        const batch = allCommentsPool.slice(commentsShownCount, commentsShownCount + COMMENTS_PAGE_SIZE);
+        batch.forEach(c => listEl.appendChild(buildCommentEl(c)));
+        commentsShownCount += batch.length;
+        commentsLoadingMore = false;
+        attachCommentsSentinel(listEl);
+        return;
+    }
+
+    // Otherwise, fetch next API page (continuation)
+    if (commentsContinuation && commentsCurrentVideoId) {
+        const requestedVideoId = commentsCurrentVideoId;
+        const requestedContinuation = commentsContinuation;
+        // Show bouncing dots
+        const loadingEl = document.createElement('div');
+        loadingEl.className = 'comments-loading-indicator sidebar-loading-indicator';
+        loadingEl.innerHTML = `
+            <span>Đang tải thêm bình luận</span>
+            <div class="load-dots"><span></span><span></span><span></span></div>
+        `;
+        listEl.appendChild(loadingEl);
+
+        fetchInvidiousComments(requestedVideoId, requestedContinuation)
+            .then(data => {
+                if (commentsCurrentVideoId !== requestedVideoId) return;
+                loadingEl.remove();
+                const newComments = data.comments || [];
+                commentsContinuation = data.continuation || null;
+                allCommentsPool.push(...newComments);
+
+                const batch = allCommentsPool.slice(commentsShownCount, commentsShownCount + COMMENTS_PAGE_SIZE);
+                batch.forEach(c => listEl.appendChild(buildCommentEl(c)));
+                commentsShownCount += batch.length;
+                commentsLoadingMore = false;
+                attachCommentsSentinel(listEl);
+            })
+            .catch(() => {
+                loadingEl.remove();
+                commentsContinuation = null; // no more pages
+                commentsLoadingMore = false;
+                attachCommentsSentinel(listEl);
+            });
+    } else {
+        commentsLoadingMore = false;
+        attachCommentsSentinel(listEl);
+    }
+}
+
 function renderComments(videoId) {
     const listEl = document.getElementById('theater-comments-list');
     const countEl = document.getElementById('comments-count');
     if (!listEl) return;
-    
+
+    // Reset pagination state for this video
+    if (commentsObserver) { commentsObserver.disconnect(); commentsObserver = null; }
+    if (commentsContainer && commentsContainer._commentsScrollHandler) {
+        commentsContainer.removeEventListener('scroll', commentsContainer._commentsScrollHandler);
+        commentsContainer._commentsScrollHandler = null;
+    }
+    allCommentsPool        = [];
+    commentsShownCount     = 0;
+    commentsLoadingMore    = false;
+    commentsContinuation   = null;
+    commentsCurrentVideoId = videoId;
     // Display loading indicator
     listEl.innerHTML = `
-        <div style="text-align: center; padding: 25px 0; color: var(--text-muted); font-size: 0.84rem; font-weight: bold; width: 100%;">
-            <span class="loading-heart" style="display:inline-block; animation: heartbeat 1s infinite alternate; width:fit-content; margin: 0 auto 10px;">💖</span>
+        <div style="text-align:center;padding:25px 0;color:var(--text-muted);font-size:0.84rem;font-weight:bold;width:100%;">
+            <span style="display:inline-block;animation:heartbeat 1s infinite alternate;margin:0 auto 10px;">💖</span>
             <p>Đang tải bình luận từ YouTube...</p>
         </div>
     `;
-    
-    // Get user submitted comments for this video
+
+    // Get user-submitted comments for this video
     let userComments = [];
     try {
         const saved = localStorage.getItem('kitty_user_comments_' + videoId);
-        if (saved) {
-            userComments = JSON.parse(saved);
-        }
-    } catch (e) {
-        console.error("Error reading user comments from localStorage:", e);
-    }
-    
-    // Helper to format/display comment items
-    const displayCommentsList = (comments, totalCount) => {
-        if (countEl) countEl.textContent = totalCount + " bình luận";
-        listEl.innerHTML = '';
-        
-        if (comments.length === 0) {
-            listEl.innerHTML = `<div style="text-align: center; padding: 15px 0; color: var(--text-muted); font-size: 0.8rem; width: 100%;">Chưa có bình luận nào. Hãy là người đầu tiên bình luận! 🌸</div>`;
-            return;
-        }
-        
-        comments.forEach(comment => {
-            const item = document.createElement('div');
-            item.className = 'comment-item';
-            
-            const isPinnedHtml = comment.isPinned 
-                ? `<span style="color: var(--accent-red); font-size: 0.72rem; font-weight: bold; margin-bottom: 4px; display: block;"><i class="fa-solid fa-thumbtack"></i> Được ghim</span>` 
-                : '';
-                
-            const likesHtml = comment.likeCount !== undefined && comment.likeCount > 0
-                ? `<span style="font-size:0.75rem; color:var(--text-muted); display:flex; align-items:center; gap:4px; margin-top:6px;"><i class="fa-regular fa-thumbs-up"></i> ${comment.likeCount}</span>` 
-                : '';
-                
-            // Check for avatar
-            let avatarHtml = '🌸';
-            if (comment.avatar) {
-                avatarHtml = comment.avatar;
-            } else if (comment.authorThumbnails && comment.authorThumbnails.length > 0) {
-                avatarHtml = `<img src="${comment.authorThumbnails[0].url}" alt="${comment.author}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-            }
-            
-            item.innerHTML = `
-                <div class="comment-avatar">${avatarHtml}</div>
-                <div class="comment-details">
-                    <div class="comment-author-row">
-                        <span class="comment-author">${comment.author}</span>
-                        <span class="comment-time">${comment.time || comment.publishedText || 'Vừa xong'}</span>
-                    </div>
-                    ${isPinnedHtml}
-                    <div class="comment-text">${comment.content || comment.text}</div>
-                    ${likesHtml}
-                </div>
-            `;
-            listEl.appendChild(item);
-        });
-    };
-    
-    // Fetch from Invidious
+        if (saved) userComments = JSON.parse(saved);
+    } catch (e) {}
+
+    // Fetch real comments
     fetchInvidiousComments(videoId)
         .then(data => {
+            if (commentsCurrentVideoId !== videoId) return;
             const ytComments = data.comments || [];
-            const combined = [...userComments, ...ytComments];
-            const totalCount = (data.commentCount || (ytComments.length + userComments.length));
-            displayCommentsList(combined.slice(0, 30), totalCount);
+            commentsContinuation = data.continuation || null;
+
+            // Combine user comments (always first) + real comments
+            allCommentsPool = [...userComments, ...ytComments];
+
+            const total = data.commentCount || allCommentsPool.length;
+            if (countEl) countEl.textContent = Number(total).toLocaleString('vi-VN') + ' bình luận';
+
+            listEl.innerHTML = '';
+
+            if (allCommentsPool.length === 0) {
+                listEl.innerHTML = `<div style="text-align:center;padding:15px 0;color:var(--text-muted);font-size:0.8rem;">Chưa có bình luận nào. Hãy là người đầu tiên bình luận! 🌸</div>`;
+                return;
+            }
+
+            // Render first batch
+            const firstBatch = allCommentsPool.slice(0, COMMENTS_PAGE_SIZE);
+            firstBatch.forEach(c => listEl.appendChild(buildCommentEl(c)));
+            commentsShownCount = firstBatch.length;
+
+            // Attach scroll sentinel
+            attachCommentsSentinel(listEl);
         })
         .catch(err => {
+            if (commentsCurrentVideoId !== videoId) return;
             console.warn(err.message);
             // Fallback to mock comments
             let mockComments = [];
@@ -349,8 +637,18 @@ function renderComments(videoId) {
             } catch (e) {
                 mockComments = [...MOCK_COMMENTS_SEED];
             }
-            const combined = [...userComments, ...mockComments];
-            displayCommentsList(combined, combined.length);
+
+            allCommentsPool = [...userComments, ...mockComments];
+            commentsContinuation = null;
+
+            const total = allCommentsPool.length;
+            if (countEl) countEl.textContent = total + ' bình luận';
+
+            listEl.innerHTML = '';
+            const firstBatch = allCommentsPool.slice(0, COMMENTS_PAGE_SIZE);
+            firstBatch.forEach(c => listEl.appendChild(buildCommentEl(c)));
+            commentsShownCount = firstBatch.length;
+            attachCommentsSentinel(listEl);
         });
 }
 
@@ -389,9 +687,181 @@ function buildSidebarCard(videoId, title, artist, duration, thumbUrl, extraAttrs
 }
 
 // Render Sidebar Cards (Recommended: fetched from API + Playlist)
+// Helper: render a batch of related video cards into recommendedList
+function renderRelatedBatch(list, videos, startIdx, count) {
+    const slice = videos.slice(startIdx, startIdx + count);
+    slice.forEach(rv => {
+        let thumb = `https://img.youtube.com/vi/${rv.videoId}/hqdefault.jpg`;
+        if (rv.videoThumbnails && rv.videoThumbnails.length > 0) {
+            const med = rv.videoThumbnails.find(t => t.quality === 'medium' || t.quality === 'mqdefault');
+            if (med && med.url) thumb = med.url;
+        }
+        const card = buildSidebarCard(
+            rv.videoId,
+            rv.title   || 'Video YouTube',
+            rv.author  || 'YouTube',
+            rv.lengthSeconds || 300,
+            thumb
+        );
+        list.appendChild(card);
+    });
+    return slice.length;
+}
+
+// Attach IntersectionObserver sentinel to the bottom of recommendedList
+function attachSidebarSentinel(list, sidebarEl) {
+    if (sidebarObserver) { sidebarObserver.disconnect(); sidebarObserver = null; }
+    if (list._mobileScrollHandler) {
+        list.removeEventListener('scroll', list._mobileScrollHandler);
+        list._mobileScrollHandler = null;
+    }
+
+    list.querySelector('.sidebar-load-sentinel')?.remove();
+    list.querySelector('.sidebar-end-marker')?.remove();
+    list.querySelector('.sidebar-loading-indicator')?.remove();
+
+    // Still have items in pool OR can fetch more → keep sentinel alive
+    const hasMoreInPool  = sidebarShownCount < sidebarRelatedVideos.length;
+    const hasMoreToFetch = sidebarFetchQueue.length > 0;
+
+    if (!hasMoreInPool && !hasMoreToFetch) {
+        const end = document.createElement('div');
+        end.className = 'sidebar-end-marker';
+        end.textContent = '\ud83c\udf38 \u0110\u00e3 t\u1ea3i t\u1ea5t c\u1ea3 video \u0111\u1ec1 xu\u1ea5t';
+        list.appendChild(end);
+        return;
+    }
+
+    const isMobileSidebar = window.innerWidth <= 768;
+
+    if (isMobileSidebar) {
+        // Mobile: sidebar is horizontal scroll — detect near right edge
+        const sentinel = document.createElement('div');
+        sentinel.className = 'sidebar-load-sentinel';
+        list.appendChild(sentinel);
+
+        const handler = () => {
+            const nearEnd = list.scrollLeft + list.clientWidth >= list.scrollWidth - 200;
+            if (nearEnd && !sidebarLoadingMore) {
+                loadMoreSidebarVideos(list, sidebarEl);
+            }
+        };
+        list.addEventListener('scroll', handler, { passive: true });
+        list._mobileScrollHandler = handler;
+    } else {
+        // Desktop: vertical IntersectionObserver
+        const sentinel = document.createElement('div');
+        sentinel.className = 'sidebar-load-sentinel';
+        list.appendChild(sentinel);
+
+        sidebarObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !sidebarLoadingMore) {
+                loadMoreSidebarVideos(list, sidebarEl);
+            }
+        }, { root: null, rootMargin: '0px 0px 300px 0px', threshold: 0 });
+
+        sidebarObserver.observe(sentinel);
+    }
+}
+
+// Load the next page of related videos into the sidebar
+function loadMoreSidebarVideos(list, sidebarEl) {
+    if (sidebarLoadingMore) return;
+    sidebarLoadingMore = true;
+
+    list.querySelector('.sidebar-load-sentinel')?.remove();
+
+    // Case 1: Still have videos in pool – render next batch immediately
+    if (sidebarShownCount < sidebarRelatedVideos.length) {
+        const added = renderRelatedBatch(list, sidebarRelatedVideos, sidebarShownCount, SIDEBAR_PAGE_SIZE);
+        sidebarShownCount += added;
+        // Add newly shown video IDs to the fetch queue (for chain-fetching)
+        sidebarRelatedVideos
+            .slice(sidebarShownCount - added, sidebarShownCount)
+            .forEach(rv => {
+                if (rv.videoId && !sidebarFetchedIds.has(rv.videoId)) {
+                    sidebarFetchQueue.push(rv.videoId);
+                    sidebarFetchedIds.add(rv.videoId);
+                }
+            });
+        sidebarLoadingMore = false;
+        attachSidebarSentinel(list, sidebarEl);
+        return;
+    }
+
+    // Case 2: Pool exhausted – fetch related videos of next queued video
+    const nextVideoId = sidebarFetchQueue.shift();
+    if (!nextVideoId) {
+        sidebarLoadingMore = false;
+        attachSidebarSentinel(list, sidebarEl);
+        return;
+    }
+
+    const loadingEl = document.createElement('div');
+    loadingEl.className = 'sidebar-loading-indicator';
+    loadingEl.innerHTML = `
+        <span>Đang tải thêm</span>
+        <div class="load-dots"><span></span><span></span><span></span></div>
+    `;
+    list.appendChild(loadingEl);
+
+    fetchInvidiousRelatedVideos(nextVideoId)
+        .then(relatedVideos => {
+            loadingEl.remove();
+            // Filter out videos already in our pool to avoid duplicates
+            const existing = new Set(sidebarRelatedVideos.map(v => v.videoId));
+            const newVideos = relatedVideos.filter(rv => !existing.has(rv.videoId));
+
+            // Push new unique videos into pool
+            sidebarRelatedVideos.push(...newVideos);
+
+            // Render next batch from the newly added videos
+            const added = renderRelatedBatch(list, sidebarRelatedVideos, sidebarShownCount, SIDEBAR_PAGE_SIZE);
+            sidebarShownCount += added;
+
+            // Enqueue newly shown video IDs for future chain fetching
+            sidebarRelatedVideos
+                .slice(sidebarShownCount - added, sidebarShownCount)
+                .forEach(rv => {
+                    if (rv.videoId && !sidebarFetchedIds.has(rv.videoId)) {
+                        sidebarFetchQueue.push(rv.videoId);
+                        sidebarFetchedIds.add(rv.videoId);
+                    }
+                });
+
+            sidebarLoadingMore = false;
+            attachSidebarSentinel(list, sidebarEl);
+        })
+        .catch(() => {
+            loadingEl.remove();
+            // Try the next video in queue
+            sidebarLoadingMore = false;
+            if (sidebarFetchQueue.length > 0) {
+                loadMoreSidebarVideos(list, sidebarEl);
+            } else {
+                attachSidebarSentinel(list, sidebarEl);
+            }
+        });
+}
+
 function renderTheaterSidebar(videoId) {
     const recommendedList = document.getElementById('theater-recommended-list');
-    const playlistList = document.getElementById('theater-playlist-list');
+    const playlistList    = document.getElementById('theater-playlist-list');
+    const sidebarEl       = document.querySelector('.theater-sidebar');
+
+    // Reset ALL pagination state
+    sidebarRelatedVideos = [];
+    sidebarShownCount    = 0;
+    sidebarLoadingMore   = false;
+    sidebarFetchQueue    = [];
+    sidebarFetchedIds    = new Set();
+    if (sidebarObserver) { sidebarObserver.disconnect(); sidebarObserver = null; }
+
+    // Seed the fetch queue with the current video so chain-fetch starts from it
+    if (videoId) {
+        sidebarFetchQueue.push(videoId);
+        sidebarFetchedIds.add(videoId);
+    }
 
     // 1. Render Recommended Videos (fetch real ones from API, fallback to seeds)
     if (recommendedList) {
@@ -403,51 +873,43 @@ function renderTheaterSidebar(videoId) {
                     <p style="font-size: 0.78rem; font-weight: 700;">Đang tải video đề xuất từ YouTube...</p>
                 </div>
             `;
-            
+
             fetchInvidiousRelatedVideos(videoId)
                 .then(relatedVideos => {
+                    sidebarRelatedVideos = relatedVideos; // store all
                     recommendedList.innerHTML = '';
-                    relatedVideos.slice(0, 8).forEach(rv => {
-                        // Pick the best thumbnail quality available
-                        let thumb = `https://img.youtube.com/vi/${rv.videoId}/hqdefault.jpg`;
-                        if (rv.videoThumbnails && rv.videoThumbnails.length > 0) {
-                            const medThumb = rv.videoThumbnails.find(t => t.quality === 'medium' || t.quality === 'mqdefault');
-                            if (medThumb && medThumb.url) thumb = medThumb.url;
-                        }
-                        const card = buildSidebarCard(
-                            rv.videoId,
-                            rv.title || 'Video YouTube',
-                            rv.author || 'YouTube',
-                            rv.lengthSeconds || 300,
-                            thumb
-                        );
-                        recommendedList.appendChild(card);
-                    });
+
+                    // Render first page
+                    const added = renderRelatedBatch(recommendedList, sidebarRelatedVideos, 0, SIDEBAR_PAGE_SIZE);
+                    sidebarShownCount = added;
+
+                    // Attach scroll sentinel for next pages
+                    attachSidebarSentinel(recommendedList, sidebarEl);
                 })
                 .catch(err => {
                     console.warn('Related videos API failed, using seeds:', err.message);
+                    sidebarRelatedVideos = RECOMMENDED_SEEDS.map(s => ({
+                        videoId: s.youtubeId, title: s.title,
+                        author: s.artist, lengthSeconds: s.duration
+                    }));
                     recommendedList.innerHTML = '';
-                    RECOMMENDED_SEEDS.forEach(track => {
-                        const card = buildSidebarCard(
-                            track.youtubeId, track.title, track.artist, track.duration,
-                            `https://img.youtube.com/vi/${track.youtubeId}/hqdefault.jpg`
-                        );
-                        recommendedList.appendChild(card);
-                    });
+                    const added = renderRelatedBatch(recommendedList, sidebarRelatedVideos, 0, SIDEBAR_PAGE_SIZE);
+                    sidebarShownCount = added;
+                    attachSidebarSentinel(recommendedList, sidebarEl);
                 });
         } else {
-            // No videoId yet — render seeds directly
+            // No videoId yet — render seeds as first page
+            sidebarRelatedVideos = RECOMMENDED_SEEDS.map(s => ({
+                videoId: s.youtubeId, title: s.title,
+                author: s.artist, lengthSeconds: s.duration
+            }));
             recommendedList.innerHTML = '';
-            RECOMMENDED_SEEDS.forEach(track => {
-                const card = buildSidebarCard(
-                    track.youtubeId, track.title, track.artist, track.duration,
-                    `https://img.youtube.com/vi/${track.youtubeId}/hqdefault.jpg`
-                );
-                recommendedList.appendChild(card);
-            });
+            const added = renderRelatedBatch(recommendedList, sidebarRelatedVideos, 0, SIDEBAR_PAGE_SIZE);
+            sidebarShownCount = added;
+            attachSidebarSentinel(recommendedList, sidebarEl);
         }
     }
-    
+
     // 2. Render My Playlist
     if (playlistList) {
         playlistList.innerHTML = '';
@@ -476,6 +938,7 @@ function renderTheaterSidebar(videoId) {
     }
 }
 
+
 let tempPlayingTrack = null;
 let currentTrackIndex = 0;
 let songDuration = playlist[0].duration;
@@ -483,6 +946,25 @@ let currentTime = 0;
 let progressInterval = null;
 let isSeeking = false;
 let isMuted = false;
+
+// --- Sidebar Infinite Scroll State ---
+let sidebarRelatedVideos = [];  // All related videos fetched from API
+let sidebarShownCount    = 0;   // How many are currently rendered
+let sidebarLoadingMore   = false;
+let sidebarObserver      = null;
+let sidebarFetchQueue    = [];  // Queue of videoIds to fetch related videos from next
+let sidebarFetchedIds    = new Set(); // Prevent duplicate fetches
+const SIDEBAR_PAGE_SIZE  = 5;
+
+// --- Comments Infinite Scroll State ---
+let allCommentsPool        = [];   // All comments loaded so far
+let commentsShownCount     = 0;    // How many are currently rendered
+let commentsLoadingMore    = false;
+let commentsObserver       = null;
+let commentsContinuation   = null; // Invidious continuation token for next page
+let commentsCurrentVideoId = null; // Track which video's comments are loaded
+let commentsContainer      = null; // The scrollable parent (theater-comments)
+const COMMENTS_PAGE_SIZE   = 10;   // Comments to show per batch
 
 // --- 1. YOUTUBE IFRAME CONTROL VIA POSTMESSAGE ---
 function sendYoutubeCommand(func, args = []) {
@@ -639,12 +1121,14 @@ function loadPreviewTrack(videoId, title, artist, duration) {
 
 // Fallback Invidious Instances list in case registry is down or CORS blocks it
 const INVIDIOUS_FALLBACK_INSTANCES = [
-    "https://invidious.privacydev.net",
+    "https://inv.nadeko.net",
+    "https://invidious.nerdvpn.de",
+    "https://inv.thepixora.com",
+    "https://yt.chocolatemoo53.com",
+    "https://invidious.tiekoetter.com",
+    "https://invidious.f5.si",
     "https://yewtu.be",
-    "https://iv.melmac.space",
-    "https://invidious.slipfox.xyz",
-    "https://invidious.namazso.eu",
-    "https://vid.puffyan.us"
+    "https://invidious.privacydev.net"
 ];
 
 async function fetchInvidiousSearch(query) {
@@ -949,6 +1433,129 @@ function updateTimelineUI() {
 }
 
 // Initializing page music controls after DOM loads
+
+// ============================================================
+// YOUTUBE SEARCH AUTOCOMPLETE (JSONP)
+// ============================================================
+function fetchYTSuggestions(query) {
+    return new Promise((resolve) => {
+        const cbName = `_ytSuggest_${Date.now()}`;
+        let settled = false;
+
+        const settle = (data) => {
+            if (settled) return;
+            settled = true;
+            try { delete window[cbName]; } catch(e) {}
+            const script = document.querySelector(`script[data-yt-cb="${cbName}"]`);
+            if (script) script.remove();
+            resolve(data);
+        };
+
+        window[cbName] = (response) => {
+            // YouTube returns: [query, [ [text, type], ... ], {}]
+            const items = Array.isArray(response[1]) ? response[1].map(s => Array.isArray(s) ? s[0] : s) : [];
+            settle(items.filter(Boolean).slice(0, 8));
+        };
+
+        const script = document.createElement('script');
+        script.dataset.ytCb = cbName;
+        script.src = `https://suggestqueries-clients6.youtube.com/complete/search?client=youtube&ds=yt&q=${encodeURIComponent(query)}&callback=${cbName}`;
+        script.onerror = () => settle([]);
+        document.head.appendChild(script);
+
+        // Fallback timeout
+        setTimeout(() => settle([]), 4000);
+    });
+}
+
+// ============================================================
+// ATTACH SEARCH SUGGESTIONS TO AN INPUT
+// ============================================================
+function attachSearchSuggestions(inputEl, onSearch) {
+    if (!inputEl) return;
+
+    // Create dropdown once
+    const dropdown = document.createElement('ul');
+    dropdown.className = 'search-suggestions-dropdown';
+    inputEl.parentElement.appendChild(dropdown);
+
+    let debounceTimer = null;
+    let kbdIndex = -1; // keyboard navigation index
+
+    const getItems = () => Array.from(dropdown.querySelectorAll('.suggestion-item'));
+
+    const hideDropdown = () => {
+        dropdown.style.display = 'none';
+        dropdown.innerHTML = '';
+        kbdIndex = -1;
+    };
+
+    const showDropdown = (suggestions) => {
+        dropdown.innerHTML = '';
+        kbdIndex = -1;
+        if (!suggestions || suggestions.length === 0) { hideDropdown(); return; }
+
+        suggestions.forEach(text => {
+            const li = document.createElement('li');
+            li.className = 'suggestion-item';
+            li.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i>${text}`;
+
+            li.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // prevent blur before click
+                inputEl.value = text;
+                hideDropdown();
+                if (typeof onSearch === 'function') onSearch(text);
+            });
+
+            dropdown.appendChild(li);
+        });
+
+        dropdown.style.display = 'block';
+    };
+
+    // Input → debounce → fetch suggestions
+    inputEl.addEventListener('input', () => {
+        const q = inputEl.value.trim();
+        clearTimeout(debounceTimer);
+        if (q.length < 2) { hideDropdown(); return; }
+
+        debounceTimer = setTimeout(async () => {
+            const suggestions = await fetchYTSuggestions(q);
+            showDropdown(suggestions);
+        }, 300);
+    });
+
+    // Keyboard navigation
+    inputEl.addEventListener('keydown', (e) => {
+        const items = getItems();
+        if (!items.length) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            kbdIndex = Math.min(kbdIndex + 1, items.length - 1);
+            items.forEach((el, i) => el.classList.toggle('kbd-active', i === kbdIndex));
+            if (items[kbdIndex]) inputEl.value = items[kbdIndex].textContent.trim();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            kbdIndex = Math.max(kbdIndex - 1, -1);
+            items.forEach((el, i) => el.classList.toggle('kbd-active', i === kbdIndex));
+            if (kbdIndex >= 0 && items[kbdIndex]) inputEl.value = items[kbdIndex].textContent.trim();
+        } else if (e.key === 'Escape') {
+            hideDropdown();
+        } else if (e.key === 'Enter') {
+            if (kbdIndex >= 0 && items[kbdIndex]) {
+                e.preventDefault();
+                inputEl.value = items[kbdIndex].textContent.trim();
+                hideDropdown();
+                if (typeof onSearch === 'function') onSearch(inputEl.value);
+            }
+        }
+    });
+
+    // Hide on blur (slight delay to allow click to fire)
+    inputEl.addEventListener('blur', () => setTimeout(hideDropdown, 180));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const playPauseBtn = document.getElementById('play-pause-btn');
     const muteBtn = document.getElementById('mute-btn');
@@ -1166,17 +1773,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Search Box events
-    const playlistSearchBtn = document.getElementById('playlist-search-btn');
+    const playlistSearchBtn   = document.getElementById('playlist-search-btn');
+    const playlistSearchInput = document.getElementById('playlist-search-input');
+
     if (playlistSearchBtn) {
         playlistSearchBtn.addEventListener('click', triggerSearch);
     }
 
-    const playlistSearchInput = document.getElementById('playlist-search-input');
     if (playlistSearchInput) {
         playlistSearchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                triggerSearch();
-            }
+            if (e.key === 'Enter') triggerSearch();
+        });
+        // Attach YouTube autocomplete suggestions
+        attachSearchSuggestions(playlistSearchInput, (text) => {
+            playlistSearchInput.value = text;
+            triggerSearch();
         });
     }
 
@@ -1702,6 +2313,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Enter') {
                 triggerTheaterSearch();
             }
+        });
+        // Attach YouTube autocomplete suggestions to theater search
+        attachSearchSuggestions(theaterSearchInput, (text) => {
+            theaterSearchInput.value = text;
+            triggerTheaterSearch();
         });
     }
     
