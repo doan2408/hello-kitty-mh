@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Chào mừng bạn đến với Thế Giới Ngọt Ngào của Hello Kitty! Khám phá, trải nghiệm tương tác đổi nơ cực xinh và lắng nghe giai điệu Lời Nói Dối Chân Thật lofi.">
+    <meta name="description" content="Khám phá thế giới Hello Kitty ngọt ngào: game thay đồ, lật nhật ký 3D, hũ kẹo phép thuật, clicker nướng bánh và nghe nhạc lofi thư giãn.">
     <title>Hello Kitty - Thế Giới Hồng Ngọt Ngào</title>
     <!-- Google Fonts: Fredoka for headings, Quicksand for body text -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,38 +30,239 @@
     <!-- Canvas for Sparkle cursor effect -->
     <canvas id="sparkle-canvas"></canvas>
 
-    <!-- Hidden YouTube iframe for background audio -->
-    <iframe id="youtube-audio-iframe" width="0" height="0" src="https://www.youtube.com/embed/-9rqKAKIE4M?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=-9rqKAKIE4M" frameborder="0" style="display: none;" allow="autoplay"></iframe>
+    <!-- Backdrop for YouTube Theater Mode -->
+    <div class="theater-backdrop" id="theater-backdrop"></div>
 
     <!-- Cute Cassette Player Widget -->
-    <div class="music-widget" id="music-widget">
-        <div class="cassette">
-            <div class="cassette-label">
-                <span class="song-title">Lời Nói Dối Chân Thật</span>
-                <span class="artist-name">JustaTee ft. Kimmese</span>
+    <!-- Outer container to prevent clipping theme-toggle -->
+    <div class="music-widget-container" id="music-widget-container">
+        <!-- Dark Mode Toggle Button -->
+        <button id="theme-toggle" class="theme-toggle-btn" title="Chuyển chế độ ngày/đêm">
+            <i class="fa-solid fa-moon"></i>
+        </button>
+
+        <div class="music-widget" id="music-widget">
+            
+            <!-- Player Tabs (Cassette vs YouTube Video) -->
+            <div class="player-tabs">
+                <button class="player-tab-btn active" data-player-tab="cassette-view" title="Xem băng Cassette"><i class="fa-solid fa-compact-disc"></i> Băng Nhạc</button>
+                <button class="player-tab-btn" data-player-tab="video-view" title="Xem YouTube Video"><i class="fa-solid fa-tv"></i> Video</button>
+                <button class="player-tab-btn-action" id="maximize-widget-btn" title="Phóng to YouTube (Chế độ Theater)"><i class="fa-solid fa-expand"></i></button>
             </div>
-            <div class="cassette-wheels">
-                <div class="wheel" id="wheel-left"><i class="fa-solid fa-compact-disc"></i></div>
-                <div class="wheel" id="wheel-right"><i class="fa-solid fa-compact-disc"></i></div>
+
+            <!-- Tab Content 1: Cassette Player -->
+            <div class="player-tab-content" id="cassette-view">
+                <div class="cassette">
+                    <div class="cassette-label">
+                        <span class="song-title" id="player-song-title">Lời Nói Dối Chân Thật (Piano)</span>
+                        <span class="artist-name" id="player-artist-name">An Coong Piano Cover</span>
+                    </div>
+                    
+                    <!-- Music Audio Visualizer Bars -->
+                    <div class="audio-visualizer" id="audio-visualizer">
+                        <div class="v-bar"></div>
+                        <div class="v-bar"></div>
+                        <div class="v-bar"></div>
+                        <div class="v-bar"></div>
+                        <div class="v-bar"></div>
+                    </div>
+ 
+                    <div class="cassette-wheels">
+                        <div class="wheel" id="wheel-left"><i class="fa-solid fa-compact-disc"></i></div>
+                        <div class="wheel" id="wheel-right"><i class="fa-solid fa-compact-disc"></i></div>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <!-- Tab Content 2: Video Player -->
+            <div class="player-tab-content" id="video-view" style="display: none;">
+                <div class="video-iframe-container">
+                    <iframe id="youtube-audio-iframe" src="https://www.youtube-nocookie.com/embed/-9rqKAKIE4M?enablejsapi=1&autoplay=0&controls=1&loop=1&playlist=-9rqKAKIE4M" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                    <button class="iframe-zoom-btn" id="iframe-zoom-btn" title="Phóng to (Chế độ Theater)"><i class="fa-solid fa-expand"></i></button>
+                </div>
+            </div>
         
         <!-- Timeline Progress Bar -->
         <div class="progress-container">
             <span id="current-time">00:00</span>
             <input type="range" id="progress-slider" min="0" max="100" value="0" title="Tua nhạc">
-            <span id="total-time">03:42</span>
+            <span id="total-time">04:19</span>
         </div>
 
+        <!-- Media Control Buttons -->
         <div class="music-controls">
+            <button id="prev-track-btn" class="control-btn control-btn-small" title="Bài trước">
+                <i class="fa-solid fa-backward-step"></i>
+            </button>
             <button id="play-pause-btn" class="control-btn" title="Bật/Tắt nhạc">
                 <i class="fa-solid fa-play" id="play-icon"></i>
             </button>
-            <button id="mute-btn" class="control-btn control-btn-small" title="Bật/Tắt âm thanh">
+            <button id="next-track-btn" class="control-btn control-btn-small" title="Bài tiếp theo">
+                <i class="fa-solid fa-forward-step"></i>
+            </button>
+            <button id="mute-btn" class="control-btn control-btn-small" title="Tắt tiếng">
                 <i class="fa-solid fa-volume-high" id="mute-icon"></i>
             </button>
+            <button id="playlist-toggle-btn" class="control-btn control-btn-small" title="Danh sách phát">
+                <i class="fa-solid fa-list-ul"></i>
+            </button>
+        </div>
+
+        <!-- Playlist Panel (Dynamic Island style expand) -->
+        <div class="playlist-panel" id="playlist-panel">
+            <div class="playlist-header">
+                <span>Danh Sách Phát 🎵</span>
+            </div>
+
+            <!-- YouTube Search Box -->
+            <div class="playlist-search-box">
+                <input type="text" id="playlist-search-input" placeholder="Tìm nhạc trên YouTube... 🌸" autocomplete="off">
+                <button id="playlist-search-btn" title="Tìm kiếm"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+
+            <!-- Search Results Panel (Hidden by default) -->
+            <div class="search-results-panel" id="search-results-panel" style="display: none;">
+                <div class="search-results-header">
+                    <span>Kết quả tìm kiếm 🔍</span>
+                    <button id="search-back-btn" title="Quay lại playlist"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
+                </div>
+                <div class="search-results-loading" id="search-results-loading" style="display: none;">
+                    <span class="loading-heart">💖</span>
+                    <p>Đang tìm nhạc trên YouTube...</p>
+                </div>
+                <div class="search-results-items" id="search-results-items">
+                    <!-- Dynamic search result cards will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Normal Playlist Items -->
+            <div class="playlist-items" id="playlist-items">
+                <div class="playlist-item active" data-index="0">
+                    <div class="item-track-info">
+                        <span class="item-title">Lời Nói Dối Chân Thật (Piano)</span>
+                        <span class="item-artist">An Coong Piano</span>
+                    </div>
+                    <span class="item-duration">04:19</span>
+                </div>
+                <div class="playlist-item" data-index="1">
+                    <div class="item-track-info">
+                        <span class="item-title">Lời Nói Dối Chân Thật (Acoustic)</span>
+                        <span class="item-artist">Hoàng Dũng x Lâm Bảo Ngọc</span>
+                    </div>
+                    <span class="item-duration">04:48</span>
+                </div>
+                <div class="playlist-item" data-index="2">
+                    <div class="item-track-info">
+                        <span class="item-title">Hello Kitty Lofi Chill Loop</span>
+                        <span class="item-artist">Sweet Lofi Beats</span>
+                    </div>
+                    <span class="item-duration">05:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- YouTube Theater Components (Hidden by default, displayed in grid layout when body.theater-active is set) -->
+        <div class="theater-header" id="theater-header">
+            <div class="theater-logo">
+                <svg class="kitty-bow-logo" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg" style="width:34px; height:auto; margin-right:5px;">
+                    <path d="M 50 40 C 35 15, 20 25, 25 45 C 30 65, 45 50, 50 45 C 55 50, 70 65, 75 45 C 80 25, 65 15, 50 40 Z" fill="#FF4B72"/>
+                    <circle cx="50" cy="43" r="8" fill="#FFE66D" stroke="#4A3E41" stroke-width="2"/>
+                </svg>
+                <span class="logo-text" style="font-size:1.25rem;">SweetTube</span>
+            </div>
+            <div class="theater-search-box">
+                <input type="text" id="theater-search-input" placeholder="Tìm kiếm nhạc trên YouTube... 🌸" autocomplete="off">
+                <button id="theater-search-btn" title="Tìm kiếm"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+            <button class="close-theater-btn" id="close-theater-btn" title="Thu nhỏ"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="theater-details" id="theater-details">
+            <h2 class="video-title" id="theater-video-title">Lời Nói Dối Chân Thật - JustaTee x Kimmese x Touliver || LYRICS VIDEO</h2>
+            
+            <div class="video-action-row">
+                <div class="channel-info">
+                    <div class="channel-avatar">🐱</div>
+                    <div class="channel-text">
+                        <h3 id="theater-channel-name">Nhà Vườn Phú Nông</h3>
+                        <span id="theater-sub-count">1.21 Tr người đăng ký</span>
+                    </div>
+                    <button class="subscribe-btn" id="theater-subscribe-btn">Đăng ký</button>
+                </div>
+                
+                <div class="video-actions">
+                    <div class="like-dislike-group">
+                        <button class="action-btn like-btn" id="theater-like-btn">
+                            <i class="fa-regular fa-thumbs-up"></i> <span id="like-count">1.8K</span>
+                        </button>
+                        <button class="action-btn dislike-btn" id="theater-dislike-btn">
+                            <i class="fa-regular fa-thumbs-down"></i>
+                        </button>
+                    </div>
+                    <button class="action-btn share-btn"><i class="fa-solid fa-share"></i> Chia sẻ</button>
+                    <button class="action-btn download-btn"><i class="fa-solid fa-download"></i> Tải xuống</button>
+                </div>
+            </div>
+            
+            <div class="video-description-box" id="theater-description-box">
+                <div class="desc-meta">
+                    <span class="desc-views" id="theater-views">1,839,201 lượt xem</span>
+                    <span class="desc-date" id="theater-date">8 năm trước</span>
+                </div>
+                <div class="desc-content" id="theater-desc-content">
+                    Bài hát "Lời Nói Dối Chân Thật" cover piano bởi An Coong...
+                </div>
+                <button class="desc-toggle-btn" id="theater-desc-toggle">Thêm</button>
+            </div>
+        </div>
+
+        <div class="theater-comments" id="theater-comments">
+            <div class="comments-header">
+                <span class="comments-count" id="comments-count">0 bình luận</span>
+                <button class="sort-btn"><i class="fa-solid fa-align-left"></i> Sắp xếp theo</button>
+            </div>
+            
+            <div class="comment-input-area">
+                <div class="comment-avatar">🌸</div>
+                <form class="comment-form" id="theater-comment-form">
+                    <input type="text" id="theater-comment-input" placeholder="Viết bình luận công khai... 🎀" autocomplete="off">
+                    <div class="comment-form-actions" id="comment-form-actions" style="display: none;">
+                        <button type="button" class="btn-cancel-comment" id="btn-cancel-comment">Hủy</button>
+                        <button type="submit" class="btn-submit-comment" id="btn-submit-comment" disabled>Bình luận</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="comments-list" id="theater-comments-list">
+                <!-- Comments will be rendered dynamically here -->
+            </div>
+        </div>
+
+        <div class="theater-sidebar" id="theater-sidebar">
+            <div class="sidebar-tabs">
+                <button class="sidebar-tab active" data-sidebar-tab="pane-next-up">Đề xuất tiếp theo</button>
+                <button class="sidebar-tab" data-sidebar-tab="pane-my-playlist">Playlist của bạn</button>
+            </div>
+            
+            <div class="sidebar-pane active" id="pane-next-up">
+                <div class="sidebar-list" id="theater-recommended-list">
+                    <!-- Recommended cards -->
+                </div>
+            </div>
+            
+            <div class="sidebar-pane" id="pane-my-playlist" style="display: none;">
+                <div class="sidebar-list" id="theater-playlist-list">
+                    <!-- My playlist cards -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Pull handle at the bottom of the widget -->
+        <div class="widget-pull-tab" id="widget-pull-tab" title="Kéo xuống xem danh sách phát">
+            <i class="fa-solid fa-chevron-down" id="pull-icon"></i>
         </div>
     </div>
+</div>
 
     <!-- Navigation Header -->
     <header class="header">
@@ -75,8 +276,10 @@
         <nav class="nav">
             <a href="#hero" class="nav-link active">Trang Chủ</a>
             <a href="#about" class="nav-link">Về Kitty</a>
-            <a href="#interactive" class="nav-link">Thiết Kế Nơ</a>
-            <a href="#treats" class="nav-link">Món Ngọt</a>
+            <a href="#interactive" class="nav-link">Thay Đồ</a>
+            <a href="#fortune" class="nav-link">Kẹo May Mắn</a>
+            <a href="#diary" class="nav-link">Nhật Ký</a>
+            <a href="#clicker" class="nav-link">Tiệm Bánh</a>
             <a href="#gallery" class="nav-link">Hình Nền</a>
         </nav>
         <a href="#club" class="cta-nav">Tham Gia Club</a>
@@ -88,15 +291,16 @@
             <div class="hero-content">
                 <div class="badge"><i class="fa-solid fa-heart"></i> Chào mừng bạn ghé chơi!</div>
                 <h1>Thế Giới Hồng<br><span>Siêu Cute</span> Của Kitty</h1>
-                <p>Nơi ngập tràn sắc hồng ấm áp, những chiếc nơ lấp lánh và giai điệu lo-fi ngọt ngào của ca khúc "Lời Nói Dối Chân Thật". Hãy cùng khám phá thế giới mộng mơ này nhé!</p>
+                <p>Nơi ngập tràn sắc hồng ấm áp, những chiếc nơ lấp lánh, các trò chơi mini dễ thương và giai điệu lo-fi ngọt ngào. Hãy cùng khám phá thế giới mộng mơ này nhé!</p>
                 <div class="hero-btns">
-                    <a href="#interactive" class="btn btn-primary">Thiết Kế Nơ <i class="fa-solid fa-wand-magic-sparkles"></i></a>
-                    <a href="#treats" class="btn btn-secondary">Khám Phá Món Ngọt</a>
+                    <a href="#interactive" class="btn btn-primary">Chơi Thay Đồ <i class="fa-solid fa-shirt"></i></a>
+                    <a href="#clicker" class="btn btn-secondary">Làm Bánh Táo</a>
                 </div>
             </div>
             <div class="hero-image-container">
                 <div class="kitty-frame">
-                    <img src="assets/hero.png" alt="Hello Kitty in her dream room" class="hero-kitty-img">
+                    <!-- Dynamic Hero Image that switches visual in Dark Mode -->
+                    <img src="assets/hero.png" alt="Hello Kitty in her sweet room" class="hero-kitty-img" id="hero-img">
                     <div class="floating-bubble bubble-1">🎂</div>
                     <div class="floating-bubble bubble-2">🎀</div>
                     <div class="floating-bubble bubble-3">💖</div>
@@ -145,32 +349,113 @@
             </div>
         </section>
 
-        <!-- Interactive Bow Section -->
+        <!-- 1. Interactive Dress-Up Section -->
         <section id="interactive" class="interactive-section">
+            <div class="section-header">
+                <h2>Phòng Thay Đồ Của Kitty</h2>
+                <p>Thiết kế phong cách thời trang độc đáo cho Hello Kitty theo ý thích của bạn!</p>
+            </div>
             <div class="interactive-grid">
                 <div class="interactive-canvas-area">
                     <div class="kitty-avatar-container">
-                        <!-- Hello Kitty Head SVG for customizing the bow color -->
-                        <svg class="kitty-svg" viewBox="0 0 400 350" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Ears -->
-                            <path d="M 90 90 L 100 20 C 120 15, 150 50, 160 70" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
-                            <path d="M 310 90 L 300 20 C 280 15, 250 50, 240 70" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                        <!-- Full Body Hello Kitty SVG for dress-up -->
+                        <svg class="kitty-svg" viewBox="0 0 400 380" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Left Ear -->
+                            <path d="M 120 100 L 105 35 C 125 30, 150 65, 158 85 Z" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                            <!-- Right Ear -->
+                            <path d="M 280 100 L 295 35 C 275 30, 250 65, 242 85 Z" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                            
+                            <!-- Legs & Feet (Behind Skirt) -->
+                            <ellipse cx="170" cy="310" rx="20" ry="14" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8"/>
+                            <ellipse cx="230" cy="310" rx="20" ry="14" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8"/>
+                            
+                            <!-- Torso Base (White Body) -->
+                            <path d="M 155 200 L 245 200 L 255 290 L 145 290 Z" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                            
+                            <!-- Arms (Behind Clothes) -->
+                            <ellipse cx="125" cy="225" rx="15" ry="24" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8" transform="rotate(-25, 125, 225)"/>
+                            <ellipse cx="275" cy="225" rx="15" ry="24" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8" transform="rotate(25, 275, 225)"/>
+
+                            <!-- Outfit Layer 1: Denim Overalls (Classic) -->
+                            <g id="dress-denim" class="outfit-group">
+                                <!-- Yellow shirt underneath -->
+                                <path d="M 155 200 L 245 200 L 250 235 L 150 235 Z" fill="#FFE66D" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                                <!-- Blue overalls -->
+                                <path d="M 148 235 L 252 235 L 255 292 L 145 292 Z" fill="#3A86FF" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                                <!-- Straps -->
+                                <rect x="160" y="200" width="12" height="38" rx="3" fill="#3A86FF" stroke="#4A3E41" stroke-width="4"/>
+                                <rect x="228" y="200" width="12" height="38" rx="3" fill="#3A86FF" stroke="#4A3E41" stroke-width="4"/>
+                                <!-- Buttons -->
+                                <circle cx="166" cy="228" r="4" fill="#FFE66D"/>
+                                <circle cx="234" cy="228" r="4" fill="#FFE66D"/>
+                            </g>
+
+                            <!-- Outfit Layer 2: Red Polka Dot Dress -->
+                            <g id="dress-dots" class="outfit-group" style="display: none;">
+                                <!-- Red Body -->
+                                <path d="M 152 200 L 248 200 L 262 292 L 138 292 Z" fill="#FF4B72" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                                <!-- White Collar -->
+                                <path d="M 178 200 Q 200 216 222 200 Q 200 206 178 200" fill="#FFFFFF" stroke="#4A3E41" stroke-width="4"/>
+                                <!-- Polka Dots -->
+                                <circle cx="170" cy="225" r="5" fill="#FFFFFF"/>
+                                <circle cx="230" cy="225" r="5" fill="#FFFFFF"/>
+                                <circle cx="200" cy="245" r="5" fill="#FFFFFF"/>
+                                <circle cx="170" cy="268" r="5" fill="#FFFFFF"/>
+                                <circle cx="230" cy="268" r="5" fill="#FFFFFF"/>
+                                <circle cx="200" cy="280" r="5" fill="#FFFFFF"/>
+                            </g>
+
+                            <!-- Outfit Layer 3: Pink Princess Gown -->
+                            <g id="dress-princess" class="outfit-group" style="display: none;">
+                                <!-- Pink Bodice -->
+                                <path d="M 153 200 L 247 200 L 250 240 L 150 240 Z" fill="#FF85A2" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                                <!-- Fluffy Skirt -->
+                                <path d="M 150 240 C 130 255, 115 295, 130 295 L 270 295 C 285 295, 270 255, 250 240 Z" fill="#FFB7C5" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                                <!-- Skirt details (gold sparkles/stripes) -->
+                                <path d="M 175 240 L 160 295" stroke="#FFF0F3" stroke-width="4"/>
+                                <path d="M 200 240 L 200 295" stroke="#FFF0F3" stroke-width="4"/>
+                                <path d="M 225 240 L 240 295" stroke="#FFF0F3" stroke-width="4"/>
+                            </g>
+
+                            <!-- Outfit Layer 4: Pyjamas (Soft Sleep Overalls for Night mode) -->
+                            <g id="dress-pajamas" class="outfit-group" style="display: none;">
+                                <!-- Light Blue Pajamas body -->
+                                <path d="M 152 200 L 248 200 L 255 292 L 145 292 Z" fill="#A2D2FF" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                                <!-- Star patterns on pajamas -->
+                                <polygon points="175,225 177,229 181,230 178,233 179,237 175,235 171,237 172,233 169,230 173,229" fill="#FFE66D"/>
+                                <polygon points="225,225 227,229 231,230 228,233 229,237 225,235 221,237 222,233 219,230 223,229" fill="#FFE66D"/>
+                                <polygon points="200,255 202,259 206,260 203,263 204,267 200,265 196,267 197,263 194,260 198,259" fill="#FFE66D"/>
+                                <polygon points="175,275 177,279 181,280 178,283 179,287 175,285 171,287 172,283 169,280 173,279" fill="#FFE66D"/>
+                                <polygon points="225,275 227,279 231,280 228,283 229,287 225,285 221,287 222,283 219,280 223,279" fill="#FFE66D"/>
+                            </g>
+
                             <!-- Head Base -->
-                            <ellipse cx="200" cy="180" rx="140" ry="110" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8"/>
+                            <ellipse cx="200" cy="135" rx="105" ry="80" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8"/>
+                            
                             <!-- Eyes -->
-                            <ellipse cx="120" cy="180" rx="12" ry="16" fill="#4A3E41"/>
-                            <ellipse cx="280" cy="180" rx="12" ry="16" fill="#4A3E41"/>
+                            <g id="kitty-eyes-open">
+                                <ellipse cx="150" cy="135" rx="10" ry="14" fill="#4A3E41"/>
+                                <ellipse cx="250" cy="135" rx="10" ry="14" fill="#4A3E41"/>
+                            </g>
+                            <!-- Closed Eyes (Sleeping) -->
+                            <g id="kitty-eyes-closed" style="display: none;">
+                                <path d="M 138 138 Q 150 148 162 138" fill="none" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                                <path d="M 238 138 Q 250 148 262 138" fill="none" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            </g>
+                            
                             <!-- Nose -->
-                            <ellipse cx="200" cy="205" rx="15" ry="11" fill="#FFE66D" stroke="#4A3E41" stroke-width="4"/>
+                            <ellipse cx="200" cy="158" rx="12" ry="9" fill="#FFE66D" stroke="#4A3E41" stroke-width="4"/>
+                            
                             <!-- Whiskers Left -->
-                            <line x1="70" y1="180" x2="30" y2="175" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
-                            <line x1="70" y1="200" x2="25" y2="205" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
-                            <line x1="70" y1="220" x2="35" y2="235" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            <line x1="80" y1="140" x2="45" y2="137" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            <line x1="80" y1="155" x2="40" y2="160" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            <line x1="80" y1="170" x2="48" y2="182" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
                             <!-- Whiskers Right -->
-                            <line x1="330" y1="180" x2="370" y2="175" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
-                            <line x1="330" y1="200" x2="375" y2="205" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
-                            <line x1="330" y1="220" x2="365" y2="235" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
-                            <!-- The Bow (Customizable) -->
+                            <line x1="320" y1="140" x2="355" y2="137" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            <line x1="320" y1="155" x2="360" y2="160" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            <line x1="320" y1="170" x2="352" y2="182" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            
+                            <!-- Customizable Bow -->
                             <g id="kitty-bow" class="bow-transition">
                                 <!-- Left Loop -->
                                 <path d="M 230 50 C 190 20, 185 75, 235 85 Z" class="bow-fill" fill="#FF4B72" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
@@ -179,26 +464,298 @@
                                 <!-- Center Knot -->
                                 <circle cx="260" cy="75" r="18" fill="#FFE66D" stroke="#4A3E41" stroke-width="8"/>
                             </g>
+
+                            <!-- Accessory Layer 1: Glasses -->
+                            <g id="acc-glasses" class="acc-group" style="display: none;">
+                                <!-- Left Ring -->
+                                <circle cx="150" cy="135" r="26" fill="none" stroke="#FF4B72" stroke-width="8"/>
+                                <!-- Right Ring -->
+                                <circle cx="250" cy="135" r="26" fill="none" stroke="#FF4B72" stroke-width="8"/>
+                                <!-- Bridge -->
+                                <path d="M 176 135 L 224 135" stroke="#FF4B72" stroke-width="8"/>
+                            </g>
+
+                            <!-- Accessory Layer 2: Flower Pin -->
+                            <g id="acc-flower" class="acc-group" style="display: none;">
+                                <!-- Petals -->
+                                <circle cx="132" cy="74" r="12" fill="#FFFFFF" stroke="#4A3E41" stroke-width="4"/>
+                                <circle cx="154" cy="64" r="12" fill="#FFFFFF" stroke="#4A3E41" stroke-width="4"/>
+                                <circle cx="166" cy="82" r="12" fill="#FFFFFF" stroke="#4A3E41" stroke-width="4"/>
+                                <circle cx="152" cy="100" r="12" fill="#FFFFFF" stroke="#4A3E41" stroke-width="4"/>
+                                <circle cx="130" cy="94" r="12" fill="#FFFFFF" stroke="#4A3E41" stroke-width="4"/>
+                                <!-- Center -->
+                                <circle cx="147" cy="83" r="10" fill="#FFE66D" stroke="#4A3E41" stroke-width="4"/>
+                            </g>
+
+                            <!-- Accessory Layer 3: Tiny Chum (Teddy Bear) -->
+                            <g id="acc-chum" class="acc-group" style="display: none;" transform="translate(45, 60)">
+                                <!-- Ears -->
+                                <circle cx="258" cy="225" r="10" fill="#C08A64" stroke="#4A3E41" stroke-width="4"/>
+                                <circle cx="298" cy="225" r="10" fill="#C08A64" stroke="#4A3E41" stroke-width="4"/>
+                                <!-- Feet -->
+                                <circle cx="262" cy="302" r="8" fill="#C08A64" stroke="#4A3E41" stroke-width="4"/>
+                                <circle cx="294" cy="302" r="8" fill="#C08A64" stroke="#4A3E41" stroke-width="4"/>
+                                <!-- Torso -->
+                                <path d="M 256 250 L 300 250 L 296 300 L 260 300 Z" fill="#C08A64" stroke="#4A3E41" stroke-width="4" stroke-linejoin="round"/>
+                                <!-- Head -->
+                                <circle cx="278" cy="240" r="22" fill="#C08A64" stroke="#4A3E41" stroke-width="4"/>
+                                <!-- Face Details -->
+                                <circle cx="269" cy="238" r="2.5" fill="#4A3E41"/>
+                                <circle cx="287" cy="238" r="2.5" fill="#4A3E41"/>
+                                <ellipse cx="278" cy="246" rx="4" ry="3" fill="#FFE66D" stroke="#4A3E41" stroke-width="2"/>
+                                <!-- Red Bow -->
+                                <path d="M 270 256 C 265 251, 265 261, 274 259 Z" fill="#FF4B72" stroke="#4A3E41" stroke-width="2"/>
+                                <path d="M 286 256 C 291 251, 291 261, 282 259 Z" fill="#FF4B72" stroke="#4A3E41" stroke-width="2"/>
+                                <circle cx="278" cy="258" r="3" fill="#FFE66D"/>
+                            </g>
                         </svg>
                         <div class="sparkle-burst" id="sparkle-burst"></div>
                     </div>
                 </div>
+                
                 <div class="interactive-controls">
-                    <div class="badge"><i class="fa-solid fa-paint-roller"></i> Tương tác sáng tạo</div>
-                    <h2>Thay Nơ Cho Kitty!</h2>
-                    <p>Hãy bấm chọn một sắc màu mà bạn yêu thích nhất để khoác lên cho Hello Kitty chiếc nơ xinh lung linh nhé!</p>
-                    <div class="bow-options">
-                        <button class="bow-btn active" data-color="#FF4B72" style="background-color: #FF4B72;" title="Hồng Đậm Đỏ"></button>
-                        <button class="bow-btn" data-color="#FF85A2" style="background-color: #FF85A2;" title="Hồng Pastel"></button>
-                        <button class="bow-btn" data-color="#3A86FF" style="background-color: #3A86FF;" title="Xanh Da Trời"></button>
-                        <button class="bow-btn" data-color="#8338EC" style="background-color: #8338EC;" title="Tím Mộng Mơ"></button>
-                        <button class="bow-btn" data-color="#FFBE0B" style="background-color: #FFBE0B;" title="Vàng Nắng"></button>
-                        <button class="bow-btn sparkle-color" data-color="sparkle" title="Lấp Lánh Phép Thuật">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        </button>
+                    <!-- Customizer Category Tabs -->
+                    <div class="customizer-tabs">
+                        <button class="custom-tab-btn active" data-tab="tab-bow">Nơ Xinh</button>
+                        <button class="custom-tab-btn" data-tab="tab-outfit">Váy Áo</button>
+                        <button class="custom-tab-btn" data-tab="tab-acc">Phụ Kiện</button>
                     </div>
-                    <div class="bow-desc">
-                        Chiếc nơ hiện tại: <span id="current-bow-name">Hồng Đậm Đỏ</span>
+
+                    <!-- Customizer Content: Bows -->
+                    <div class="customizer-pane active" id="tab-bow">
+                        <h3>Chọn Nơ Cho Kitty</h3>
+                        <p>Thay đổi màu sắc chiếc nơ trên tai của Hello Kitty.</p>
+                        <div class="bow-options">
+                            <button class="bow-btn active" data-color="#FF4B72" style="background-color: #FF4B72;" title="Hồng Đậm Đỏ"></button>
+                            <button class="bow-btn" data-color="#FF85A2" style="background-color: #FF85A2;" title="Hồng Pastel"></button>
+                            <button class="bow-btn" data-color="#3A86FF" style="background-color: #3A86FF;" title="Xanh Da Trời"></button>
+                            <button class="bow-btn" data-color="#8338EC" style="background-color: #8338EC;" title="Tím Mộng Mơ"></button>
+                            <button class="bow-btn" data-color="#FFBE0B" style="background-color: #FFBE0B;" title="Vàng Nắng"></button>
+                            <button class="bow-btn sparkle-color" data-color="sparkle" title="Lấp Lánh Phép Thuật">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </button>
+                        </div>
+                        <div class="bow-desc">Nơ hiện tại: <span id="current-bow-name">Hồng Đậm Đỏ</span></div>
+                    </div>
+
+                    <!-- Customizer Content: Outfits -->
+                    <div class="customizer-pane" id="tab-outfit">
+                        <h3>Chọn Đầm Cho Kitty</h3>
+                        <p>Khoác lên Kitty những chiếc váy đầm ngọt ngào nhất.</p>
+                        <div class="outfit-options">
+                            <button class="outfit-card-btn active" data-outfit="dress-denim">
+                                <span class="outfit-preview-color" style="background-color: #3A86FF;"></span>
+                                <h4>Yếm Xanh Denim</h4>
+                                <p>Cổ điển & năng động</p>
+                            </button>
+                            <button class="outfit-card-btn" data-outfit="dress-dots">
+                                <span class="outfit-preview-color" style="background-color: #FF4B72;"></span>
+                                <h4>Đầm Đỏ Chấm Bi</h4>
+                                <p>Rực rỡ & truyền thống</p>
+                            </button>
+                            <button class="outfit-card-btn" data-outfit="dress-princess">
+                                <span class="outfit-preview-color" style="background-color: #FFB7C5;"></span>
+                                <h4>Váy Hồng Công Chúa</h4>
+                                <p>Kiêu sa & bồng bềnh</p>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Customizer Content: Accessories -->
+                    <div class="customizer-pane" id="tab-acc">
+                        <h3>Chọn Phụ Kiện Đi Kèm</h3>
+                        <p>Thêm phụ kiện đáng yêu hoặc người bạn đồng hành cho Kitty.</p>
+                        <div class="acc-options">
+                            <button class="acc-card-btn" data-acc="acc-glasses">
+                                <span class="acc-icon"><i class="fa-solid fa-glasses"></i></span>
+                                <h4>Kính Mắt Tròn</h4>
+                            </button>
+                            <button class="acc-card-btn" data-acc="acc-flower">
+                                <span class="acc-icon"><i class="fa-solid fa-seedling"></i></span>
+                                <h4>Kẹp Tóc Bông Hoa</h4>
+                            </button>
+                            <button class="acc-card-btn" data-acc="acc-chum">
+                                <span class="acc-icon"><i class="fa-solid fa-paw"></i></span>
+                                <h4>Teddy Tiny Chum</h4>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Fortune Candy Section -->
+        <section id="fortune" class="fortune-section">
+            <div class="section-header">
+                <h2>Hũ Kẹo May Mắn Của Kitty</h2>
+                <p>Bấm vào hũ kẹo thủy tinh lấp lánh để nhận lời khuyên hoặc thông điệp ngọt ngào hôm nay nhé!</p>
+            </div>
+            <div class="fortune-container">
+                <!-- Glowing Jar -->
+                <div class="jar-wrapper">
+                    <div class="glowing-jar" id="candy-jar">
+                        <div class="jar-lid"></div>
+                        <div class="jar-body">
+                            <!-- Floating Candies inside -->
+                            <div class="candy candy-pink"></div>
+                            <div class="candy candy-yellow"></div>
+                            <div class="candy candy-blue"></div>
+                            <div class="candy candy-purple"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fortune Message Card -->
+                <div class="fortune-board">
+                    <div class="badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Lời nhắn yêu thương</div>
+                    <div class="fortune-card-front" id="fortune-display">
+                        <div class="fortune-placeholder-content">
+                            <i class="fa-solid fa-cookie-bite cookie-pulse"></i>
+                            <h3>Hãy chạm vào hũ kẹo thủy tinh để lấy lời chúc may mắn!</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 3D Flipping Diary Section -->
+        <section id="diary" class="diary-section">
+            <div class="section-header">
+                <h2>Nhật Ký Mộng Mơ</h2>
+                <p>Cùng lật mở những trang viết tay và sticker ghi chép cuộc sống hàng ngày dễ thương của Hello Kitty</p>
+            </div>
+            <div class="diary-book-container">
+                <!-- 3D Book Structure -->
+                <div class="book" id="diary-book">
+                    <!-- Page 1: Cover -->
+                    <div class="page cover-page" id="page-1">
+                        <div class="page-side front">
+                            <div class="diary-cover">
+                                <div class="diary-bow-deco">🎀</div>
+                                <h2>My Sweet Diary</h2>
+                                <p>Hello Kitty</p>
+                                <span class="diary-lock"><i class="fa-solid fa-lock"></i></span>
+                            </div>
+                        </div>
+                        <div class="page-side back">
+                            <h3>Trang mở đầu</h3>
+                            <p>Đây là góc nhỏ để tớ lưu giữ những kỷ niệm ấm áp bên gia đình và bạn bè.</p>
+                            <img src="assets/apple_pie.png" alt="Apple illustration" class="page-sticker">
+                        </div>
+                    </div>
+
+                    <!-- Page 2: Story 1 -->
+                    <div class="page" id="page-2">
+                        <div class="page-side front">
+                            <h3>Nướng bánh cùng Mimmy 🎂</h3>
+                            <p>Hôm nay là một ngày cuối tuần nắng đẹp ấm áp. Tớ và Mimmy đã cùng nhau học mẹ làm bánh quy bơ.</p>
+                            <p>Mimmy nặn bánh hình gấu bông, còn tớ nặn hình những chiếc nơ đỏ. Cả căn bếp thơm phức hương bơ ngọt lịm!</p>
+                            <div class="page-sticker-group">
+                                <span class="sticker-emoji">🍪</span>
+                                <span class="sticker-emoji">🍳</span>
+                            </div>
+                        </div>
+                        <div class="page-side back">
+                            <h3>Sở thích lớn nhất 🍏</h3>
+                            <p>Mọi người thường hay hỏi tớ yêu thích cái gì nhất. Câu trả lời chính là: bánh táo mẹ làm!</p>
+                            <p>Không gì có thể so sánh được với chiếc bánh táo nướng giòn rụm, phủ quế thơm lừng mà mẹ đặc biệt chuẩn bị.</p>
+                            <img src="assets/cupcake.png" alt="Cupcake illustration" class="page-sticker">
+                        </div>
+                    </div>
+
+                    <!-- Page 3: Story 2 -->
+                    <div class="page" id="page-3">
+                        <div class="page-side front">
+                            <h3>Đi picnic ở công viên 🌸</h3>
+                            <p>Hôm nay cả nhóm bạn (Daniel, Fifi, Tracy) cùng nhau đi dã ngoại. Bọn tớ mang theo rất nhiều bánh ngọt.</p>
+                            <p>Chúng tớ đã cùng chơi đuổi bắt, ngắm bướm bay và chụp ảnh polaroid kỷ niệm cực kỳ vui vẻ!</p>
+                            <span class="sticker-emoji big-emoji">🎈</span>
+                        </div>
+                        <div class="page-side back">
+                            <div class="diary-end">
+                                <h3>Hẹn gặp lại nhé!</h3>
+                                <p>Nhật ký đóng lại tại đây, nhưng những hành trình dễ thương sẽ còn viết tiếp mỗi ngày.</p>
+                                <div class="diary-end-bow">🎀</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book Navigation Controls -->
+                <div class="book-controls">
+                    <button class="btn btn-secondary btn-book" id="book-prev-btn" disabled><i class="fa-solid fa-arrow-left"></i>Lật về</button>
+                    <button class="btn btn-primary btn-book" id="book-next-btn">Lật sang <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Apple Pie Clicker Section -->
+        <section id="clicker" class="clicker-section">
+            <div class="section-header">
+                <h2>Tiệm Bánh Táo Của Kitty</h2>
+                <p>Click vào chiếc bánh táo lớn để nướng thật nhiều bánh, tích lũy điểm và mở khóa các trang thiết bị hiện đại nhé!</p>
+            </div>
+            
+            <div class="clicker-layout">
+                <!-- Clicker Area -->
+                <div class="clicker-game-box">
+                    <div class="score-board">
+                        <h3 id="pie-count">0</h3>
+                        <p>Bánh Táo đã nướng 🥧</p>
+                        <span id="pies-per-second">0 pies/sec</span>
+                    </div>
+                    
+                    <div class="pie-click-area">
+                        <div class="pie-glow"></div>
+                        <img src="assets/apple_pie.png" alt="Bánh Táo lớn Clicker" id="click-pie" class="click-pie-img">
+                        <div class="pie-shadow"></div>
+                    </div>
+                </div>
+
+                <!-- Upgrades Shop Area -->
+                <div class="upgrades-shop">
+                    <div class="badge"><i class="fa-solid fa-store"></i> Nâng cấp tiệm bánh</div>
+                    
+                    <div class="upgrade-list">
+                        <button class="shop-item-btn" id="upgrade-click" data-cost="15" data-val="1">
+                            <span class="shop-icon">🥄</span>
+                            <div class="shop-details">
+                                <h4>Nhào Bột Bằng Tay</h4>
+                                <p>Cộng thêm +1 bánh mỗi click</p>
+                                <span class="shop-cost">Cost: 15 pies</span>
+                            </div>
+                            <span class="shop-qty" id="qty-click">0</span>
+                        </button>
+                        
+                        <button class="shop-item-btn" id="upgrade-oven" data-cost="50" data-val="1">
+                            <span class="shop-icon">🔥</span>
+                            <div class="shop-details">
+                                <h4>Lò Nướng Nhỏ</h4>
+                                <p>Tự động nướng +1 bánh mỗi giây</p>
+                                <span class="shop-cost">Cost: 50 pies</span>
+                            </div>
+                            <span class="shop-qty" id="qty-oven">0</span>
+                        </button>
+
+                        <button class="shop-item-btn" id="upgrade-mimmy" data-cost="250" data-val="5">
+                            <span class="shop-icon">🐱</span>
+                            <div class="shop-details">
+                                <h4>Trợ Thủ Mimmy</h4>
+                                <p>Tự động nướng +5 bánh mỗi giây</p>
+                                <span class="shop-cost">Cost: 250 pies</span>
+                            </div>
+                            <span class="shop-qty" id="qty-mimmy">0</span>
+                        </button>
+
+                        <button class="shop-item-btn" id="upgrade-gold" data-cost="1000" data-val="25">
+                            <span class="shop-icon">🥧</span>
+                            <div class="shop-details">
+                                <h4>Lò Nướng Phép Thuật</h4>
+                                <p>Tự động nướng +25 bánh mỗi giây</p>
+                                <span class="shop-cost">Cost: 1000 pies</span>
+                            </div>
+                            <span class="shop-qty" id="qty-gold">0</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -315,8 +872,8 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-bow">🎀</div>
-        <p class="copyright">Hello Kitty Sweet World. Thiết kế bởi Nguyễn Bá Đoàn với cả trái tim :))) </p>
-        <p class="song-credit">Đang phát: <strong>Lời Nói Dối Chân Thật</strong> - JustaTee ft. Kimmese (Lofi Version)</p>
+        <p class="copyright">&copy; Hello Kitty Sweet World. Thiết kế bởi Đ&H với cả trái tim.</p>
+        <p class="song-credit">Giai điệu: <strong id="footer-song-title">Lời Nói Dối Chân Thật (Piano)</strong></p>
         <div class="footer-socials">
             <a href="#" class="social-link" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
             <a href="#" class="social-link" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
