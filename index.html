@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Chào mừng bạn đến với Thế Giới Ngọt Ngào của Hello Kitty! Khám phá, trải nghiệm tương tác đổi nơ cực xinh và lắng nghe giai điệu Lời Nói Dối Chân Thật lofi.">
+    <title>Hello Kitty - Thế Giới Hồng Ngọt Ngào</title>
+    <!-- Google Fonts: Fredoka for headings, Quicksand for body text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for cute icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Welcome Overlay for Autoplay Bypass -->
+    <div id="welcome-overlay" class="welcome-overlay">
+        <div class="welcome-card">
+            <div class="welcome-bow">🎀</div>
+            <h2>Chào Mừng Bạn Đến Với<br><span>Thế Giới Hello Kitty</span></h2>
+            <p>Hãy bước vào không gian ngập tràn sắc hồng ngọt ngào và những giai điệu mộng mơ đang chờ đón bạn!</p>
+            <button id="enter-btn" class="btn btn-primary btn-enter">Bước Vào Thế Giới Mơ Màng ✨</button>
+        </div>
+    </div>
+
+    <!-- Canvas for Sparkle cursor effect -->
+    <canvas id="sparkle-canvas"></canvas>
+
+    <!-- Hidden YouTube iframe for background audio -->
+    <iframe id="youtube-audio-iframe" width="0" height="0" src="https://www.youtube.com/embed/-9rqKAKIE4M?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=-9rqKAKIE4M" frameborder="0" style="display: none;" allow="autoplay"></iframe>
+
+    <!-- Cute Cassette Player Widget -->
+    <div class="music-widget" id="music-widget">
+        <div class="cassette">
+            <div class="cassette-label">
+                <span class="song-title">Lời Nói Dối Chân Thật</span>
+                <span class="artist-name">JustaTee ft. Kimmese</span>
+            </div>
+            <div class="cassette-wheels">
+                <div class="wheel" id="wheel-left"><i class="fa-solid fa-compact-disc"></i></div>
+                <div class="wheel" id="wheel-right"><i class="fa-solid fa-compact-disc"></i></div>
+            </div>
+        </div>
+        
+        <!-- Timeline Progress Bar -->
+        <div class="progress-container">
+            <span id="current-time">00:00</span>
+            <input type="range" id="progress-slider" min="0" max="100" value="0" title="Tua nhạc">
+            <span id="total-time">03:42</span>
+        </div>
+
+        <div class="music-controls">
+            <button id="play-pause-btn" class="control-btn" title="Bật/Tắt nhạc">
+                <i class="fa-solid fa-play" id="play-icon"></i>
+            </button>
+            <button id="mute-btn" class="control-btn control-btn-small" title="Bật/Tắt âm thanh">
+                <i class="fa-solid fa-volume-high" id="mute-icon"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="logo">
+            <svg class="kitty-bow-logo" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 50 40 C 35 15, 20 25, 25 45 C 30 65, 45 50, 50 45 C 55 50, 70 65, 75 45 C 80 25, 65 15, 50 40 Z" fill="#FF4B72"/>
+                <circle cx="50" cy="43" r="8" fill="#FFE66D" stroke="#4A3E41" stroke-width="2"/>
+            </svg>
+            <span class="logo-text">Hello Kitty</span>
+        </div>
+        <nav class="nav">
+            <a href="#hero" class="nav-link active">Trang Chủ</a>
+            <a href="#about" class="nav-link">Về Kitty</a>
+            <a href="#interactive" class="nav-link">Thiết Kế Nơ</a>
+            <a href="#treats" class="nav-link">Món Ngọt</a>
+            <a href="#gallery" class="nav-link">Hình Nền</a>
+        </nav>
+        <a href="#club" class="cta-nav">Tham Gia Club</a>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="hero-section">
+            <div class="hero-content">
+                <div class="badge"><i class="fa-solid fa-heart"></i> Chào mừng bạn ghé chơi!</div>
+                <h1>Thế Giới Hồng<br><span>Siêu Cute</span> Của Kitty</h1>
+                <p>Nơi ngập tràn sắc hồng ấm áp, những chiếc nơ lấp lánh và giai điệu lo-fi ngọt ngào của ca khúc "Lời Nói Dối Chân Thật". Hãy cùng khám phá thế giới mộng mơ này nhé!</p>
+                <div class="hero-btns">
+                    <a href="#interactive" class="btn btn-primary">Thiết Kế Nơ <i class="fa-solid fa-wand-magic-sparkles"></i></a>
+                    <a href="#treats" class="btn btn-secondary">Khám Phá Món Ngọt</a>
+                </div>
+            </div>
+            <div class="hero-image-container">
+                <div class="kitty-frame">
+                    <img src="assets/hero.png" alt="Hello Kitty in her dream room" class="hero-kitty-img">
+                    <div class="floating-bubble bubble-1">🎂</div>
+                    <div class="floating-bubble bubble-2">🎀</div>
+                    <div class="floating-bubble bubble-3">💖</div>
+                    <div class="floating-bubble bubble-4">🍏</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section (Polaroid Deck) -->
+        <section id="about" class="about-section">
+            <div class="section-header">
+                <h2>Hồ Sơ Dễ Thương</h2>
+                <p>Bạn đã thực sự hiểu rõ về người bạn Hello Kitty này chưa?</p>
+            </div>
+            <div class="polaroid-container">
+                <div class="polaroid-card card-1">
+                    <div class="polaroid-img-wrapper">
+                        <div class="kitty-sticker">🎂</div>
+                        <img src="assets/wallpaper_dream.png" alt="Kitty's Birthday">
+                    </div>
+                    <div class="polaroid-text">
+                        <h3>Sinh Nhật</h3>
+                        <p>Vào ngày 1 tháng 11 tại ngoại ô London, Anh Quốc ngọt ngào.</p>
+                    </div>
+                </div>
+                <div class="polaroid-card card-2">
+                    <div class="polaroid-img-wrapper">
+                        <div class="kitty-sticker">🍏</div>
+                        <img src="assets/apple_pie.png" alt="Kitty's Size">
+                    </div>
+                    <div class="polaroid-text">
+                        <h3>Chiều Cao & Cân Nặng</h3>
+                        <p>Cao bằng 5 quả táo, nặng bằng 3 quả táo đỏ căng mọng.</p>
+                    </div>
+                </div>
+                <div class="polaroid-card card-3">
+                    <div class="polaroid-img-wrapper">
+                        <div class="kitty-sticker">🍪</div>
+                        <img src="assets/cookie.png" alt="Kitty's Love">
+                    </div>
+                    <div class="polaroid-text">
+                        <h3>Sở Thích</h3>
+                        <p>Nướng bánh cookie, ăn bánh táo mẹ làm và kết bạn bốn phương.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Bow Section -->
+        <section id="interactive" class="interactive-section">
+            <div class="interactive-grid">
+                <div class="interactive-canvas-area">
+                    <div class="kitty-avatar-container">
+                        <!-- Hello Kitty Head SVG for customizing the bow color -->
+                        <svg class="kitty-svg" viewBox="0 0 400 350" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Ears -->
+                            <path d="M 90 90 L 100 20 C 120 15, 150 50, 160 70" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                            <path d="M 310 90 L 300 20 C 280 15, 250 50, 240 70" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                            <!-- Head Base -->
+                            <ellipse cx="200" cy="180" rx="140" ry="110" fill="#FFFFFF" stroke="#4A3E41" stroke-width="8"/>
+                            <!-- Eyes -->
+                            <ellipse cx="120" cy="180" rx="12" ry="16" fill="#4A3E41"/>
+                            <ellipse cx="280" cy="180" rx="12" ry="16" fill="#4A3E41"/>
+                            <!-- Nose -->
+                            <ellipse cx="200" cy="205" rx="15" ry="11" fill="#FFE66D" stroke="#4A3E41" stroke-width="4"/>
+                            <!-- Whiskers Left -->
+                            <line x1="70" y1="180" x2="30" y2="175" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            <line x1="70" y1="200" x2="25" y2="205" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            <line x1="70" y1="220" x2="35" y2="235" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            <!-- Whiskers Right -->
+                            <line x1="330" y1="180" x2="370" y2="175" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            <line x1="330" y1="200" x2="375" y2="205" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            <line x1="330" y1="220" x2="365" y2="235" stroke="#4A3E41" stroke-width="8" stroke-linecap="round"/>
+                            <!-- The Bow (Customizable) -->
+                            <g id="kitty-bow" class="bow-transition">
+                                <!-- Left Loop -->
+                                <path d="M 230 50 C 190 20, 185 75, 235 85 Z" class="bow-fill" fill="#FF4B72" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                                <!-- Right Loop -->
+                                <path d="M 285 95 C 335 105, 330 50, 290 60 Z" class="bow-fill" fill="#FF4B72" stroke="#4A3E41" stroke-width="8" stroke-linejoin="round"/>
+                                <!-- Center Knot -->
+                                <circle cx="260" cy="75" r="18" fill="#FFE66D" stroke="#4A3E41" stroke-width="8"/>
+                            </g>
+                        </svg>
+                        <div class="sparkle-burst" id="sparkle-burst"></div>
+                    </div>
+                </div>
+                <div class="interactive-controls">
+                    <div class="badge"><i class="fa-solid fa-paint-roller"></i> Tương tác sáng tạo</div>
+                    <h2>Thay Nơ Cho Kitty!</h2>
+                    <p>Hãy bấm chọn một sắc màu mà bạn yêu thích nhất để khoác lên cho Hello Kitty chiếc nơ xinh lung linh nhé!</p>
+                    <div class="bow-options">
+                        <button class="bow-btn active" data-color="#FF4B72" style="background-color: #FF4B72;" title="Hồng Đậm Đỏ"></button>
+                        <button class="bow-btn" data-color="#FF85A2" style="background-color: #FF85A2;" title="Hồng Pastel"></button>
+                        <button class="bow-btn" data-color="#3A86FF" style="background-color: #3A86FF;" title="Xanh Da Trời"></button>
+                        <button class="bow-btn" data-color="#8338EC" style="background-color: #8338EC;" title="Tím Mộng Mơ"></button>
+                        <button class="bow-btn" data-color="#FFBE0B" style="background-color: #FFBE0B;" title="Vàng Nắng"></button>
+                        <button class="bow-btn sparkle-color" data-color="sparkle" title="Lấp Lánh Phép Thuật">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
+                    </div>
+                    <div class="bow-desc">
+                        Chiếc nơ hiện tại: <span id="current-bow-name">Hồng Đậm Đỏ</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sweet Treats (Carousel) -->
+        <section id="treats" class="treats-section">
+            <div class="section-header">
+                <h2>Bánh Ngọt Của Kitty</h2>
+                <p>Khám phá các món ăn ngọt ngào thơm phức tự tay Hello Kitty nướng</p>
+            </div>
+            <div class="carousel-container">
+                <button class="carousel-control prev" id="carousel-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="carousel-track-container">
+                    <ul class="carousel-track" id="carousel-track">
+                        <li class="carousel-slide current-slide">
+                            <div class="treat-card">
+                                <div class="treat-img-box">
+                                    <img src="assets/apple_pie.png" alt="Bánh táo mẹ làm">
+                                </div>
+                                <h3>Bánh Táo Mẹ Làm</h3>
+                                <p>Món ăn yêu thích nhất của Kitty. Bánh nướng nóng hổi giòn rụm với nhân táo chua ngọt đậm đà hương quế.</p>
+                                <span class="card-tag">Favorite 🍎</span>
+                            </div>
+                        </li>
+                        <li class="carousel-slide">
+                            <div class="treat-card">
+                                <div class="treat-img-box">
+                                    <img src="assets/cupcake.png" alt="Cupcake Dâu Tây">
+                                </div>
+                                <h3>Cupcake Dâu Tây</h3>
+                                <p>Bánh cupcake xốp mềm phủ lớp kem phô mai dâu tây mịn màng ngọt ngào trang trí với một lát dâu tây tươi.</p>
+                                <span class="card-tag">Sweet Cream 🍓</span>
+                            </div>
+                        </li>
+                        <li class="carousel-slide">
+                            <div class="treat-card">
+                                <div class="treat-img-box">
+                                    <img src="assets/cookie.png" alt="Cookie Hello Kitty">
+                                </div>
+                                <h3>Cookie Hello Kitty</h3>
+                                <p>Những chiếc bánh quy bơ giòn thơm phức được cắt theo hình khuôn mặt Kitty và nơ đỏ ngộ nghĩnh.</p>
+                                <span class="card-tag">Homemade 🍪</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <button class="carousel-control next" id="carousel-next"><i class="fa-solid fa-chevron-right"></i></button>
+                <div class="carousel-nav" id="carousel-dots">
+                    <button class="carousel-indicator current-dot"></button>
+                    <button class="carousel-indicator"></button>
+                    <button class="carousel-indicator"></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wallpapers (Grid & Lightbox) -->
+        <section id="gallery" class="gallery-section">
+            <div class="section-header">
+                <h2>Bộ Sưu Tập Hình Nền</h2>
+                <p>Tải xuống những tấm hình nền siêu cute để trang trí máy tính hoặc điện thoại nhé</p>
+            </div>
+            <div class="gallery-grid">
+                <div class="gallery-item" data-src="assets/wallpaper_dream.png">
+                    <img src="assets/wallpaper_dream.png" alt="Kitty Dreamy Space">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus"></i>
+                        <span>Xem Chi Tiết</span>
+                    </div>
+                </div>
+                <div class="gallery-item" data-src="assets/hero.png">
+                    <img src="assets/hero.png" alt="Kitty in Sweet Room">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus"></i>
+                        <span>Xem Chi Tiết</span>
+                    </div>
+                </div>
+                <div class="gallery-item" data-src="assets/cupcake.png">
+                    <img src="assets/cupcake.png" alt="Sweet Strawberry Cupcake Illustration">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus"></i>
+                        <span>Xem Chi Tiết</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lightbox Modal -->
+        <div class="lightbox" id="lightbox">
+            <span class="lightbox-close" id="lightbox-close">&times;</span>
+            <img class="lightbox-content" id="lightbox-img" src="" alt="">
+            <div class="lightbox-caption" id="lightbox-caption"></div>
+        </div>
+
+        <!-- Join Club (Newsletter Signup) -->
+        <section id="club" class="club-section">
+            <div class="club-card">
+                <div class="club-deco-left">🌸</div>
+                <div class="club-deco-right">🎀</div>
+                <h2>Tham Gia Sweet Club!</h2>
+                <p>Đăng ký nhận thư từ Hello Kitty để nhận thông báo về công thức làm bánh ngọt mới, quà tặng hình nền cute và những tin tức cực dễ thương hàng tuần.</p>
+                <form class="club-form" id="club-form">
+                    <div class="input-group">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" placeholder="Nhập email ngọt ngào của bạn..." required id="club-email">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-submit">Tham Gia Ngay <i class="fa-solid fa-paper-plane"></i></button>
+                </form>
+                <div class="form-feedback" id="form-feedback"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-bow">🎀</div>
+        <p class="copyright">Hello Kitty Sweet World. Thiết kế bởi Nguyễn Bá Đoàn với cả trái tim :))) </p>
+        <p class="song-credit">Đang phát: <strong>Lời Nói Dối Chân Thật</strong> - JustaTee ft. Kimmese (Lofi Version)</p>
+        <div class="footer-socials">
+            <a href="#" class="social-link" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="social-link" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="social-link" title="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
+        </div>
+    </footer>
+
+    <!-- Main Script -->
+    <script src="script.js"></script>
+</body>
+</html>
