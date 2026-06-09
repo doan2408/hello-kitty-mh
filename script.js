@@ -60,14 +60,14 @@ const MOCK_COMMENTS_SEED = [
     { author: "My Melody 🌸", avatar: "🌸", text: "Không gian màu hồng này kết hợp với giai điệu lofi này thật hoàn hảo đó nha! 🌸🎀", time: "2 ngày trước" }
 ];
 
-// Recommended Seeds for Sidebar
+// Recommended Seeds for Sidebar (real YouTube video IDs — thumbnails will always load)
 const RECOMMENDED_SEEDS = [
-    { title: "Hello Kitty Theme Song 🎀", artist: "Sanrio Japan", youtubeId: "c2Q4fW59Hj8", duration: 180 },
-    { title: "Sweet Dream Lofi Beats 🌙", artist: "Lofi Girl", youtubeId: "5qap5aO4i9A", duration: 240 },
-    { title: "Cupcake Baking Melody 🧁", artist: "Sweet Cream Beats", youtubeId: "1p2g2v6fV6A", duration: 215 },
-    { title: "Sanrio Town Picnic Theme 🌸", artist: "Sanrio Melody Club", youtubeId: "tN6n9F2c8tA", duration: 195 },
-    { title: "Dear Daniel Love Piano Solo 🎹", artist: "An Coong Piano", youtubeId: "x9gE5x7hT6Y", duration: 270 },
-    { title: "Strawberry Lofi Pop Chill 🍓", artist: "Sweet Lofi Pop", youtubeId: "a9x6p1z2q9Y", duration: 205 }
+    { title: "Hello Kitty's Dreamy Afternoon 🌸", artist: "Lofi Lulupop", youtubeId: "BzEHa_tQ2DI", duration: 3600 },
+    { title: "Sweet Dream Lofi Beats 🌙", artist: "Lofi Girl", youtubeId: "5qap5aO4i9A", duration: 3600 },
+    { title: "Cinnamoroll's Beachside Tea ☁️", artist: "Lofi Lulupop", youtubeId: "N4tLwN5yO5k", duration: 3600 },
+    { title: "Hello Kitty Lofi Chill Loop 🎀", artist: "Sweet Lofi Beats", youtubeId: "jfKfPfyJRdk", duration: 300 },
+    { title: "Lời Nói Dối Chân Thật (Piano) 🎹", artist: "An Coong Piano Cover", youtubeId: "-9rqKAKIE4M", duration: 259 },
+    { title: "Lời Nói Dối Chân Thật (Acoustic) 🎵", artist: "Hoàng Dũng x Lâm Bảo Ngọc", youtubeId: "cTYrJKRhjgg", duration: 288 }
 ];
 
 // Helper to generate consistent seeded pseudo-random values based on ID
@@ -165,8 +165,8 @@ function updateTheaterDetails(track) {
     }
     
     // 5. Render comments and sidebar
-    renderComments(track.youtubeId || track.youtubeId);
-    renderTheaterSidebar();
+    renderComments(track.youtubeId);
+    renderTheaterSidebar(track.youtubeId);
 }
 
 // Fetch comments from YouTube via Invidious API with sequential fallback retry loop
@@ -211,6 +211,48 @@ async function fetchInvidiousComments(videoId) {
         }
     }
     throw new Error("Không thể tải bình luận từ YouTube. Sử dụng bình luận giả lập! 🌸");
+}
+
+// Fetch related/recommended videos from YouTube via Invidious API
+async function fetchInvidiousRelatedVideos(videoId) {
+    let instances = [...INVIDIOUS_FALLBACK_INSTANCES];
+    
+    // Try to get healthy instances from registry
+    try {
+        const response = await fetch('https://api.invidious.io/instances.json?sort_by=type,health');
+        if (response.ok) {
+            const data = await response.json();
+            const healthyList = data
+                .filter(inst => inst[1].cors === true && inst[1].api !== false && inst[1].type === 'https' && (!inst[1].monitor || inst[1].monitor.down === false))
+                .map(inst => inst[1].uri);
+            if (healthyList.length > 0) {
+                instances = [...new Set([...healthyList, ...INVIDIOUS_FALLBACK_INSTANCES])];
+            }
+        }
+    } catch (e) {
+        console.warn("Could not fetch Invidious registry for related videos:", e);
+    }
+    
+    for (const uri of instances) {
+        try {
+            const url = `${uri}/api/v1/videos/${videoId}`;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6000);
+            const res = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            if (res.ok) {
+                const data = await res.json();
+                if (data && Array.isArray(data.recommendedVideos) && data.recommendedVideos.length > 0) {
+                    console.log(`Fetched ${data.recommendedVideos.length} related videos via ${uri}`);
+                    return data.recommendedVideos;
+                }
+            }
+        } catch (err) {
+            console.warn(`Instance failed for related videos: ${uri}`, err);
+        }
+    }
+    throw new Error("Không thể tải video đề xuất. Dùng danh sách gợi ý mặc định 🌸");
 }
 
 // Render Comment Section (Combines user comments with real YouTube comments or mock comments)
@@ -312,41 +354,98 @@ function renderComments(videoId) {
         });
 }
 
-// Render Sidebar Cards (Recommended + Playlist)
-function renderTheaterSidebar() {
+// Helper: build a sidebar card element
+function buildSidebarCard(videoId, title, artist, duration, thumbUrl, extraAttrs) {
+    const card = document.createElement('div');
+    card.className = 'sidebar-card';
+    card.setAttribute('data-video-id', videoId);
+    card.setAttribute('data-title', title);
+    card.setAttribute('data-artist', artist);
+    card.setAttribute('data-duration', duration);
+    if (extraAttrs) {
+        Object.entries(extraAttrs).forEach(([k, v]) => card.setAttribute(k, v));
+    }
+    
+    const durSec = typeof duration === 'number' ? duration : (parseInt(duration) || 300);
+    const viewsVal = getSeededValue(videoId, 5000, 800000);
+    const viewsStr = viewsVal >= 1000 ? Math.round(viewsVal / 1000) + ' N lượt xem' : viewsVal + ' lượt xem';
+    const primaryThumb = thumbUrl || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    const fallbackThumb = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+    const fallback2Thumb = `https://img.youtube.com/vi/${videoId}/default.jpg`;
+    
+    card.innerHTML = `
+        <div class="sidebar-thumb-wrapper">
+            <img src="${primaryThumb}" alt="${title.replace(/"/g, '&quot;')}"
+                 onerror="if(this.src!=='${fallbackThumb}'){this.src='${fallbackThumb}';}else{this.src='${fallback2Thumb}';this.onerror=null;}">
+            <span class="sidebar-duration-badge">${formatTime(durSec)}</span>
+        </div>
+        <div class="sidebar-card-info">
+            <span class="sidebar-card-title">${title}</span>
+            <span class="sidebar-card-artist">${artist}</span>
+            <span class="sidebar-card-views">${viewsStr}</span>
+        </div>
+    `;
+    return card;
+}
+
+// Render Sidebar Cards (Recommended: fetched from API + Playlist)
+function renderTheaterSidebar(videoId) {
     const recommendedList = document.getElementById('theater-recommended-list');
     const playlistList = document.getElementById('theater-playlist-list');
-    
-    const getSeededViewsStr = (vidId) => {
-        const viewsVal = getSeededValue(vidId, 5000, 800000);
-        if (viewsVal >= 1000) return Math.round(viewsVal / 1000) + " N lượt xem";
-        return viewsVal + " lượt xem";
-    };
 
-    // 1. Render Recommended Seeds
+    // 1. Render Recommended Videos (fetch real ones from API, fallback to seeds)
     if (recommendedList) {
-        recommendedList.innerHTML = '';
-        RECOMMENDED_SEEDS.forEach(track => {
-            const card = document.createElement('div');
-            card.className = 'sidebar-card';
-            card.setAttribute('data-video-id', track.youtubeId);
-            card.setAttribute('data-title', track.title);
-            card.setAttribute('data-artist', track.artist);
-            card.setAttribute('data-duration', track.duration);
-            
-            card.innerHTML = `
-                <div class="sidebar-thumb-wrapper">
-                    <img src="https://img.youtube.com/vi/${track.youtubeId}/hqdefault.jpg" alt="${track.title}">
-                    <span class="sidebar-duration-badge">${formatTime(track.duration)}</span>
-                </div>
-                <div class="sidebar-card-info">
-                    <span class="sidebar-card-title">${track.title}</span>
-                    <span class="sidebar-card-artist">${track.artist}</span>
-                    <span class="sidebar-card-views">${getSeededViewsStr(track.youtubeId)}</span>
+        if (videoId) {
+            // Show loading spinner while fetching
+            recommendedList.innerHTML = `
+                <div style="text-align: center; padding: 30px 0; color: var(--text-muted);">
+                    <span style="display:block; animation: heartbeat 1s infinite alternate; font-size:1.5rem; margin-bottom:10px;">💖</span>
+                    <p style="font-size: 0.78rem; font-weight: 700;">Đang tải video đề xuất từ YouTube...</p>
                 </div>
             `;
-            recommendedList.appendChild(card);
-        });
+            
+            fetchInvidiousRelatedVideos(videoId)
+                .then(relatedVideos => {
+                    recommendedList.innerHTML = '';
+                    relatedVideos.slice(0, 8).forEach(rv => {
+                        // Pick the best thumbnail quality available
+                        let thumb = `https://img.youtube.com/vi/${rv.videoId}/hqdefault.jpg`;
+                        if (rv.videoThumbnails && rv.videoThumbnails.length > 0) {
+                            const medThumb = rv.videoThumbnails.find(t => t.quality === 'medium' || t.quality === 'mqdefault');
+                            if (medThumb && medThumb.url) thumb = medThumb.url;
+                        }
+                        const card = buildSidebarCard(
+                            rv.videoId,
+                            rv.title || 'Video YouTube',
+                            rv.author || 'YouTube',
+                            rv.lengthSeconds || 300,
+                            thumb
+                        );
+                        recommendedList.appendChild(card);
+                    });
+                })
+                .catch(err => {
+                    console.warn('Related videos API failed, using seeds:', err.message);
+                    recommendedList.innerHTML = '';
+                    RECOMMENDED_SEEDS.forEach(track => {
+                        const card = buildSidebarCard(
+                            track.youtubeId, track.title, track.artist, track.duration,
+                            `https://img.youtube.com/vi/${track.youtubeId}/hqdefault.jpg`
+                        );
+                        recommendedList.appendChild(card);
+                    });
+                });
+        } else {
+            // No videoId yet — render seeds directly
+            recommendedList.innerHTML = '';
+            RECOMMENDED_SEEDS.forEach(track => {
+                const card = buildSidebarCard(
+                    track.youtubeId, track.title, track.artist, track.duration,
+                    `https://img.youtube.com/vi/${track.youtubeId}/hqdefault.jpg`
+                );
+                recommendedList.appendChild(card);
+            });
+        }
     }
     
     // 2. Render My Playlist
@@ -354,29 +453,24 @@ function renderTheaterSidebar() {
         playlistList.innerHTML = '';
         playlist.forEach((track, index) => {
             const isActive = index === currentTrackIndex && !tempPlayingTrack;
-            const card = document.createElement('div');
-            card.className = `sidebar-card ${isActive ? 'active' : ''}`;
-            card.setAttribute('data-index', index);
-            card.setAttribute('data-video-id', track.youtubeId);
-            card.setAttribute('data-title', track.title);
-            card.setAttribute('data-artist', track.artist);
-            card.setAttribute('data-duration', track.duration);
+            const card = buildSidebarCard(
+                track.youtubeId, track.title, track.artist, track.duration,
+                `https://img.youtube.com/vi/${track.youtubeId}/hqdefault.jpg`,
+                { 'data-index': String(index) }
+            );
             if (isActive) {
+                card.classList.add('active');
                 card.style.borderColor = 'var(--accent-red)';
                 card.style.backgroundColor = 'var(--light-pink)';
+                const titleEl = card.querySelector('.sidebar-card-title');
+                const viewsEl = card.querySelector('.sidebar-card-views');
+                if (titleEl) titleEl.style.color = 'var(--accent-red)';
+                if (viewsEl) {
+                    viewsEl.style.color = 'var(--accent-red)';
+                    viewsEl.style.fontWeight = '700';
+                    viewsEl.textContent = '🌸 Đang phát';
+                }
             }
-            
-            card.innerHTML = `
-                <div class="sidebar-thumb-wrapper">
-                    <img src="https://img.youtube.com/vi/${track.youtubeId}/hqdefault.jpg" alt="${track.title}">
-                    <span class="sidebar-duration-badge">${formatTime(track.duration)}</span>
-                </div>
-                <div class="sidebar-card-info">
-                    <span class="sidebar-card-title" style="${isActive ? 'color: var(--accent-red);' : ''}">${track.title}</span>
-                    <span class="sidebar-card-artist">${track.artist}</span>
-                    <span class="sidebar-card-views" style="${isActive ? 'color: var(--accent-red); font-weight:700;' : ''}">${isActive ? '🌸 Đang phát' : 'Bài hát trong playlist'}</span>
-                </div>
-            `;
             playlistList.appendChild(card);
         });
     }
@@ -1463,7 +1557,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Refresh list UI
                 renderPlaylist();
-                renderTheaterSidebar();
+                const _curTrack1 = tempPlayingTrack || playlist[currentTrackIndex];
+                renderTheaterSidebar(_curTrack1 ? _curTrack1.youtubeId : null);
                 
                 // Change add button to checkmark
                 const parentDiv = addBtn.parentElement;
@@ -1535,7 +1630,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (resetBtn) {
                 resetBtn.addEventListener('click', () => {
                     theaterSearchInput.value = '';
-                    renderTheaterSidebar();
+                    const _curTrack2 = tempPlayingTrack || playlist[currentTrackIndex];
+                    renderTheaterSidebar(_curTrack2 ? _curTrack2.youtubeId : null);
                     playCuteSound();
                 });
             }
@@ -1554,7 +1650,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
                 theaterSearchInput.value = '';
-                renderTheaterSidebar();
+                const _curTrack3 = tempPlayingTrack || playlist[currentTrackIndex];
+                renderTheaterSidebar(_curTrack3 ? _curTrack3.youtubeId : null);
                 playCuteSound();
             });
         }
